@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 let locks = 0;
+let historyEntryId = 0;
 const HISTORY_KEY = '__lpOverlay';
 type Overlay = { current: (() => void) | undefined };
 const overlays: Overlay[] = [];
@@ -36,7 +37,7 @@ function syncHistory() {
   }
 
   while (historyEntries.length < overlays.length) {
-    const id = crypto.randomUUID();
+    const id = String(++historyEntryId);
     window.history.pushState({ ...window.history.state, [HISTORY_KEY]: id }, '');
     historyEntries.push(id);
   }
