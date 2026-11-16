@@ -1,3 +1,4 @@
+import { ResponsiveImage } from './ui/ResponsiveImage';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
 import { GALLERY_IMAGES, SITE_INFO } from '../data/services';
@@ -26,7 +27,7 @@ export function Gallery() {
               href={SITE_INFO.instagram}
               target="_blank"
               rel="noreferrer"
-              className="btn-outline self-start md:self-auto !py-2.5"
+              className="btn-outline min-h-11 min-w-11 self-start md:self-auto !py-2.5"
             >
               <InstagramIcon className="w-4 h-4" /> @terapiaslapalmilla
             </a>
@@ -44,9 +45,12 @@ export function Gallery() {
               style={{ ['--reveal-delay' as string]: `${(i % 4) * 70}ms` }}
               aria-label={`Ver foto: ${img.caption}`}
             >
-              <img
+              <ResponsiveImage
                 src={img.src}
-                alt={img.caption}
+                sizes={i === 0 || i === 5
+                  ? '(min-width: 1280px) 600px, (min-width: 768px) calc((100vw - 80px) / 2), (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)'
+                  : '(min-width: 1280px) 292px, (min-width: 768px) calc((100vw - 112px) / 4), (min-width: 640px) calc((100vw - 80px) / 2), calc((100vw - 52px) / 2)'}
+                alt=""
                 loading="lazy"
                 decoding="async"
                 className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.06]"
@@ -107,12 +111,13 @@ function Lightbox({ index, setIndex }: { index: number; setIndex: (i: number | n
       </div>
 
       <div className="relative flex flex-1 items-center justify-center px-4 sm:px-20 min-h-0" onClick={close}>
-        <img
+        <ResponsiveImage
           key={img.src}
           src={img.src}
+          sizes="(min-width: 640px) calc(100vw - 160px), calc(100vw - 32px)"
           alt={img.caption}
           onClick={(e) => e.stopPropagation()}
-          className="animate-fade-in max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
+          className="animate-fade-in w-auto max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
         />
         <button
           onClick={(e) => { e.stopPropagation(); go(-1); }}
@@ -131,7 +136,7 @@ function Lightbox({ index, setIndex }: { index: number; setIndex: (i: number | n
       </div>
 
       <div className="px-5 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-center">
-        <p className="text-sm text-cream/90">{img.caption}</p>
+        <p aria-hidden="true" className="text-sm text-cream/90">{img.caption}</p>
         <div className="no-scrollbar mx-auto mt-4 flex max-w-full justify-start sm:justify-center gap-2 overflow-x-auto">
           {GALLERY_IMAGES.map((g, i) => (
             <button
@@ -142,7 +147,7 @@ function Lightbox({ index, setIndex }: { index: number; setIndex: (i: number | n
               }`}
               aria-label={`Ir a la foto ${i + 1}`}
             >
-              <img src={g.src} alt="" className="h-full w-full object-cover" />
+              <ResponsiveImage src={g.src} sizes="64px" thumbnail alt="" className="h-full w-full object-cover" />
             </button>
           ))}
         </div>

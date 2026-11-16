@@ -30,6 +30,7 @@ export const SITE_INFO = {
   shortLocation: 'Ruta J-470, La Palmilla, Rauco',
   distance: 'A 5 km de Rauco',
   phone: '+56 9 9825 2628',
+  phoneRaw: '+56998252628',
   whatsappRaw: '56998252628',
   email: 'terapia.reservas@gmail.com',
   schedule: 'Jueves a sábado, 15:00 a 21:00 hrs',

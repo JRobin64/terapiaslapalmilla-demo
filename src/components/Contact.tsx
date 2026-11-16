@@ -1,6 +1,7 @@
-import { ArrowUpRight, Clock, Mail, MapPin, Navigation } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowUpRight, Clock, Mail, MapPin, Navigation, Phone } from 'lucide-react';
 import { SITE_INFO, WEEK_SCHEDULE, whatsappLink } from '../data/services';
-import { getOpenStatus } from '../lib/time';
+import { getOpenStatus, type OpenStatus } from '../lib/time';
 import { trackGAEvent } from '../utils/analytics';
 import { SectionHeading } from './ui/Section';
 import { WhatsAppIcon } from './ui/BrandIcons';
@@ -9,7 +10,14 @@ import { WhatsAppIcon } from './ui/BrandIcons';
 const ORDER = [1, 2, 3, 4, 5, 6, 0];
 
 export function Contact() {
-  const status = getOpenStatus();
+  const [status, setStatus] = useState<OpenStatus | null>(null);
+
+  useEffect(() => {
+    setStatus(getOpenStatus());
+    const t = window.setInterval(() => setStatus(getOpenStatus()), 60_000);
+    return () => window.clearInterval(t);
+  }, []);
+
   return (
     <section id="contacto" className="py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -36,29 +44,34 @@ export function Contact() {
               href={SITE_INFO.mapsUrl}
               target="_blank"
               rel="noreferrer"
-              className="btn-primary absolute bottom-4 left-4 !py-2.5 !text-[13px] shadow-lg"
+              className="btn-primary min-h-11 min-w-11 absolute bottom-4 left-4 !py-2.5 !text-[13px] shadow-lg"
             >
               <Navigation className="w-4 h-4" /> Cómo llegar
             </a>
           </div>
 
           <div className="grid gap-4 lg:col-span-5">
-            <a
-              href={whatsappLink('Hola Terapias La Palmilla, quisiera consultar disponibilidad.')}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => trackGAEvent('contact_whatsapp', { source: 'contact_card' })}
-              className="group flex items-center gap-4 rounded-[1.75rem] bg-forest p-6 text-cream transition hover:bg-moss"
-            >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-whatsapp text-white">
-                <WhatsAppIcon className="w-6 h-6" />
-              </span>
-              <span className="flex-1">
-                <span className="block text-xs text-sage">WhatsApp y teléfono</span>
-                <span className="block text-lg font-semibold">{SITE_INFO.phone}</span>
-              </span>
-              <ArrowUpRight className="w-5 h-5 text-gold transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </a>
+            <div className="rounded-[1.75rem] bg-forest p-6 text-cream">
+              <a
+                href={whatsappLink('Hola Terapias La Palmilla, quisiera consultar disponibilidad.')}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackGAEvent('contact_whatsapp', { source: 'contact_card' })}
+                className="group flex min-h-11 items-center gap-3 rounded-2xl transition hover:bg-moss"
+              >
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-whatsapp text-white">
+                  <WhatsAppIcon className="w-6 h-6" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-xs text-sage">WhatsApp y teléfono</span>
+                  <span className="block text-base sm:text-lg font-semibold">{SITE_INFO.phone}</span>
+                </span>
+                <ArrowUpRight className="w-5 h-5 shrink-0 text-gold transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </a>
+              <a href={`tel:${SITE_INFO.phoneRaw}`} className="btn-ghost-light mt-4 min-h-11 w-full">
+                <Phone className="w-4 h-4" /> Llamar
+              </a>
+            </div>
 
             <a
               href={`mailto:${SITE_INFO.email}`}
@@ -74,22 +87,22 @@ export function Contact() {
             </a>
 
             <div className="rounded-[1.75rem] bg-white p-6 ring-1 ring-line">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-2 text-sm font-semibold text-forest">
                   <Clock className="w-4 h-4" /> Horario de atención
                 </span>
                 <span
-                  className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                    status.isOpen ? 'bg-emerald-50 text-emerald-700' : 'bg-sand text-bark'
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                    status?.isOpen ? 'bg-emerald-50 text-emerald-700' : 'bg-sand text-bark'
                   }`}
                 >
-                  {status.isOpen ? 'Abierto ahora' : 'Cerrado ahora'}
+                  {status ? (status.isOpen ? 'Abierto ahora' : 'Cerrado ahora') : 'Jue a Sáb · 15–21 h'}
                 </span>
               </div>
               <ul className="mt-4 space-y-1.5 text-sm">
                 {ORDER.map((d) => {
                   const s = WEEK_SCHEDULE[d];
-                  const today = d === status.today;
+                  const today = d === status?.today;
                   return (
                     <li
                       key={s.day}
@@ -97,7 +110,7 @@ export function Contact() {
                     >
                       <span>
                         {s.day}
-                        {today && <span className="ml-1.5 text-[11px] font-medium text-bark">(hoy)</span>}
+                        {today && <span className="ml-1.5 text-xs font-medium text-bark">(hoy)</span>}
                       </span>
                       <span className="tabular-nums">{s.open ? `${s.open} – ${s.close}` : 'Cerrado'}</span>
                     </li>

@@ -1,3 +1,4 @@
+import { ResponsiveImage } from './ui/ResponsiveImage';
 import { Droplets, Leaf, Users } from 'lucide-react';
 import { useReveal } from '../hooks/useReveal';
 
@@ -45,22 +46,25 @@ export function Intro() {
 
         <div className="lg:col-span-6 reveal" style={{ ['--reveal-delay' as string]: '150ms' }}>
           <div className="relative grid grid-cols-5 grid-rows-6 gap-3 sm:gap-4 h-[420px] sm:h-[540px]">
-            <img
+            <ResponsiveImage
               src="./images/jardin.webp"
+              sizes="(min-width: 1280px) 339.2px, (min-width: 1024px) calc(30vw - 44.8px), (min-width: 640px) calc(60vw - 44.8px), calc(60vw - 28.8px)"
               alt="Jardín y áreas verdes del recinto"
               loading="lazy"
               decoding="async"
               className="col-span-3 row-span-6 h-full w-full rounded-[1.75rem] object-cover"
             />
-            <img
+            <ResponsiveImage
               src="./images/espacio-descanso.webp"
+              sizes="(min-width: 1280px) 220.8px, (min-width: 1024px) calc(20vw - 35.2px), (min-width: 640px) calc(40vw - 35.2px), calc(40vw - 23.2px)"
               alt="Espacio de descanso"
               loading="lazy"
               decoding="async"
               className="col-span-2 row-span-3 h-full w-full rounded-[1.75rem] object-cover"
             />
-            <img
+            <ResponsiveImage
               src="./images/estero.webp"
+              sizes="(min-width: 1280px) 220.8px, (min-width: 1024px) calc(20vw - 35.2px), (min-width: 640px) calc(40vw - 35.2px), calc(40vw - 23.2px)"
               alt="Estero en los alrededores"
               loading="lazy"
               decoding="async"

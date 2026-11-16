@@ -1,0 +1,6 @@
+{
+  "problemas": [],
+  "resumen": "Revisión completada sobre ia/T006 respecto a 94911b294db9f9bf33b1af9ad14c4f8b48234003. Los cambios cumplen todos los criterios de aceptación: `npx tsc -b` y `npm run build` terminan sin errores; `dist/index.html` contiene el HTML prerenderizado dentro de `<div id=\"root\">` (`grep -c \"Haz una pausa\" dist/index.html` = 2) con rutas relativas (`./`) y sin dejar `dist-ssr/` en `dist/`; `src/main.tsx` usa `hydrateRoot` manteniendo `StrictMode` en producción y `createRoot` en desarrollo; y `Hero.tsx`, `Contact.tsx`, `Footer.tsx` y `QuickActions.tsx` difieren al montaje (`useEffect`) la lectura de hora, año y `window.innerHeight`, mostrando estado neutro en el prerender sin accesos a APIs de navegador durante el render.",
+  "veredicto": "APROBADO",
+  "commit": "4f10b11bf446b5872ebd8a464c5ab29482b3fff3"
+}

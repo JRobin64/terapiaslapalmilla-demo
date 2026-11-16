@@ -1,0 +1,6 @@
+{
+  "problemas": [],
+  "resumen": "Revisión ronda 2 de T004 aprobada: la corrección en src/components/Gallery.tsx (línea 120) añade w-auto a ResponsiveImage en el Lightbox, manteniendo proporcional la caja de la imagen cuando max-h-full limita la altura. Se verificaron nuevamente scripts/imagenes.py (idempotente, 13 fotos, 24 variantes sin ampliar imágenes menores ni tocar logo.webp), ResponsiveImage.tsx, imageMetadata.ts, los sizes y dimensiones en Intro, ServiceCard, ServiceDrawer, Stay, Gallery, BookingModal, Navbar y Footer, que Hero.tsx e index.html no fueron modificados, y que npx tsc -b y npm run build pasan sin errores.",
+  "veredicto": "APROBADO",
+  "commit": "aa3896e840b448b1f6593bc14491f6a9f857e4e0"
+}

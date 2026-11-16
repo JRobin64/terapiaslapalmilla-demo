@@ -1,0 +1,6 @@
+{
+  "problemas": [],
+  "resumen": "Revisión de la rama ia/T003 respecto a 66a894e179753dc0feacd75a912fea6018a1cb26 completada sin hallazgos bloqueantes ni importantes. Se verificó el cumplimiento de todos los criterios de aceptación en src/hooks/useScrollLock.ts, src/components/BookingModal.tsx y src/components/Navbar.tsx: gestión de historial con popstate/Escape y agrupación por microtareas para StrictMode y overlays encadenados o anidados manteniendo el contador de locks, navegación diferida por anclas en el menú móvil tras el cierre del overlay, tamaño de fuente text-[16px] en los dos input y el textarea del paso 3 de BookingModal, y desplazamiento dentro del área con scroll del modal hacia scheduleRef al elegir fecha en el paso 2 respetando prefers-reduced-motion. Comprobaciones ejecutadas directamente: npx tsc -b (código 0), npm run build (código 0, 1601 módulos transformados en 1.07s), git diff --check (código 0) y simulación en Node de la máquina de estados de useOverlay (StrictMode, overlays encadenados, botón atrás y closeMenuThen).",
+  "veredicto": "APROBADO",
+  "commit": "6c0e0236f39e4efea91a98bdc62eaad291c2ce1f"
+}
