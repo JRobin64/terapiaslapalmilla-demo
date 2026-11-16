@@ -58,7 +58,7 @@ export function Navbar({ onBook }: { onBook: () => void }) {
                 solid ? 'bg-transparent' : 'bg-cream/90 px-2 py-1 shadow-sm'
               }`}
             >
-              <img src={SITE_INFO.logo} alt="" className="h-9 md:h-10 w-auto" width={66} height={40} />
+              <img src={SITE_INFO.logo} alt="" className="h-9 md:h-10 w-auto" width={180} height={109} />
             </span>
             <span
               className={`hidden lg:block font-display text-xl font-semibold tracking-tight transition-colors duration-500 ${

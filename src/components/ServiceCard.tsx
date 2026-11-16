@@ -1,3 +1,4 @@
+import { ResponsiveImage } from './ui/ResponsiveImage';
 import { ArrowUpRight, Clock } from 'lucide-react';
 import type { ServiceItem } from '../data/services';
 import { formatClp } from '../utils/analytics';
@@ -19,8 +20,9 @@ export function ServiceCard({ service, onOpen, onBook }: Props) {
         className="relative block aspect-[4/3] overflow-hidden bg-sand text-left"
         aria-label={`Ver detalle de ${service.name}`}
       >
-        <img
+        <ResponsiveImage
           src={service.image}
+          sizes="(min-width: 1280px) 389.33px, (min-width: 1024px) calc((100vw - 112px) / 3), (min-width: 640px) calc((100vw - 88px) / 2), calc(100vw - 40px)"
           alt={service.name}
           loading="lazy"
           decoding="async"

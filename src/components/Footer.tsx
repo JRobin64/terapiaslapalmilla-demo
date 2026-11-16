@@ -14,7 +14,7 @@ export function Footer({ onBook }: { onBook: () => void }) {
 
         <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4 text-sm">
           <div className="lg:col-span-2">
-            <img src={SITE_INFO.logo} alt={SITE_INFO.name} className="h-14 w-auto rounded-lg bg-cream p-1.5" />
+            <img src={SITE_INFO.logo} width={180} height={109} alt={SITE_INFO.name} className="h-14 w-auto rounded-lg bg-cream p-1.5" />
             <p className="mt-4 max-w-sm leading-relaxed">
               Centro de relajación y reflexión a 5 km de Rauco. Tinajas, masajes y alojamiento en
               un entorno natural.

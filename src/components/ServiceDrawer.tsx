@@ -1,3 +1,4 @@
+import { ResponsiveImage } from './ui/ResponsiveImage';
 import { Check, Clock, X } from 'lucide-react';
 import type { ServiceItem } from '../data/services';
 import { whatsappLink } from '../data/services';
@@ -22,7 +23,7 @@ export function ServiceDrawer({ service, onClose, onBook }: Props) {
 
       <div className="animate-drawer relative flex max-h-[92svh] w-full flex-col overflow-hidden rounded-t-[2rem] bg-cream md:max-h-none md:h-full md:max-w-[520px] md:rounded-none md:rounded-l-[2rem]">
         <div className="relative h-56 sm:h-72 shrink-0">
-          <img src={service.image} alt={service.name} className="h-full w-full object-cover" />
+          <ResponsiveImage src={service.image} sizes="(min-width: 768px) 520px, 100vw" alt={service.name} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           <span className="absolute left-1/2 top-2.5 h-1 w-10 -translate-x-1/2 rounded-full bg-white/70 md:hidden" />
           <button
