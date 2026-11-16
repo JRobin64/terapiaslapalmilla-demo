@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Info, X } from 'lucide-react';
 import { CATEGORIES, SERVICES, SITE_INFO, whatsappLink, type ServiceItem } from '../data/services';
 import { useOverlay } from '../hooks/useScrollLock';
-import { getTimeSlots, getUpcomingDates } from '../lib/time';
+import { getUpcomingDates, nowMinutesInChile, slotsForDate } from '../lib/time';
 import { formatClp, trackGAEvent } from '../utils/analytics';
 import { WhatsAppIcon } from './ui/BrandIcons';
 
@@ -55,7 +55,16 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
 
   useOverlay(isOpen, onClose);
 
-  const dates = useMemo(() => (isOpen ? getUpcomingDates(12) : []), [isOpen]);
+  const allDates = useMemo(() => (isOpen ? getUpcomingDates(13) : []), [isOpen]);
+  const nowMin = useMemo(() => nowMinutesInChile(), [isOpen, step]);
+  // Solo fechas en que el servicio elegido todavía tiene horarios disponibles
+  const dates = useMemo(
+    () =>
+      allDates
+        .filter((d) => !service || slotsForDate(service.minutes, d, nowMin).length > 0)
+        .slice(0, 12),
+    [allDates, service, nowMin]
+  );
 
   // Reiniciar al abrir
   useEffect(() => {
@@ -82,18 +91,20 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
 
   const isStay = service?.minutes === null;
   const tier = service ? service.tiers[tierIndex] ?? service.tiers[0] : null;
-  const slots = service && service.minutes ? getTimeSlots(service.minutes) : [];
   const date = dates.find((d) => d.iso === dateIso) ?? null;
+  const slots = service && date ? slotsForDate(service.minutes, date, nowMin) : [];
+  const validTime = isStay || (!!time && slots.includes(time));
   const timeLabel = isStay ? '18:00 hrs (check-in)' : time ? `${time} hrs` : '';
 
   const canNext =
     (step === 1 && !!service && !!tier) ||
-    (step === 2 && !!date && (isStay || !!time)) ||
-    (step === 3 && name.trim().length > 1 && phone.replace(/\D/g, '').length >= 8);
+    (step === 2 && !!date && validTime) ||
+    (step === 3 && !!date && validTime && name.trim().length > 1 && phone.replace(/\D/g, '').length >= 8);
 
   const selectService = (s: ServiceItem) => {
     if (s.id !== service?.id) {
       setTierIndex(0);
+      setDateIso(null);
       setTime(null);
     }
     setService(s);
@@ -276,7 +287,10 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                         <button
                           key={d.iso}
                           type="button"
-                          onClick={() => setDateIso(d.iso)}
+                          onClick={() => {
+                            setDateIso(d.iso);
+                            if (time && service && !slotsForDate(service.minutes, d, nowMin).includes(time)) setTime(null);
+                          }}
                           className={`flex flex-col items-center rounded-2xl py-2.5 transition ${
                             sel ? 'bg-forest text-cream' : 'bg-white ring-1 ring-line hover:ring-forest/40 text-ink'
                           }`}
@@ -305,6 +319,8 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                         <span className="font-display text-2xl font-semibold text-forest">12:00</span>
                       </div>
                     </div>
+                  ) : !date ? (
+                    <p className="rounded-2xl bg-white p-4 text-sm text-muted ring-1 ring-line">Elige primero una fecha para ver los horarios.</p>
                   ) : (
                     <div className="grid grid-cols-4 gap-2">
                       {slots.map((t) => {

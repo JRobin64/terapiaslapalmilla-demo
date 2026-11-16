@@ -62,15 +62,22 @@ export function getOpenStatus(): OpenStatus {
   return { isOpen: false, today: day, label: 'Cerrado' };
 }
 
+/** Minutos transcurridos desde medianoche en Chile. */
+export function nowMinutesInChile(): number {
+  return nowInChile().minutes;
+}
+
 export interface BookableDate {
   iso: string;
+  isToday: boolean;
   weekday: string;
   dayNum: number;
   month: string;
   long: string;
 }
 
-/** Próximas fechas en que el centro atiende (jueves, viernes y sábado). */
+/** Próximas fechas en que el centro atiende (jueves, viernes y sábado), incluido hoy si corresponde.
+ *  Si quedan horas disponibles hoy lo decide quien llama, según el servicio (ver BookingModal). */
 export function getUpcomingDates(count = 12): BookableDate[] {
   const { day, minutes, date: base } = nowInChile();
   const out: BookableDate[] = [];
@@ -83,10 +90,10 @@ export function getUpcomingDates(count = 12): BookableDate[] {
     const wd = (day + i) % 7;
     const s = WEEK_SCHEDULE[wd];
     if (!s.open || !s.close) continue;
-    // Hoy solo si aún queda tiempo razonable antes del cierre
-    if (i === 0 && minutes > toMinutes(s.close) - 90) continue;
+    if (i === 0 && minutes >= toMinutes(s.close)) continue;
     out.push({
       iso: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+      isToday: i === 0,
       weekday: i === 0 ? 'Hoy' : s.short,
       dayNum: d.getDate(),
       month: monthFmt.format(d).replace('.', ''),
@@ -97,9 +104,26 @@ export function getUpcomingDates(count = 12): BookableDate[] {
 }
 
 /** Horarios de inicio cada 30 min, que permitan terminar antes del cierre. */
-export function getTimeSlots(durationMin: number, open = '15:00', close = '21:00'): string[] {
+export function getTimeSlots(
+  durationMin: number,
+  open = '15:00',
+  close = '21:00',
+  earliest = 0
+): string[] {
   const slots: string[] = [];
   const last = toMinutes(close) - durationMin;
-  for (let m = toMinutes(open); m <= last; m += 30) slots.push(fromMinutes(m));
+  for (let m = toMinutes(open); m <= last; m += 30) if (m >= earliest) slots.push(fromMinutes(m));
   return slots;
+}
+
+/** Anticipación mínima (min) para reservar algo que empieza hoy. */
+export const SAME_DAY_NOTICE = 30;
+/** Hora de check-in del alojamiento. */
+export const CHECK_IN = '18:00';
+
+/** Horarios disponibles para un servicio en una fecha (vacío si ese día ya no se puede reservar). */
+export function slotsForDate(minutesNeeded: number | null, date: BookableDate, nowMin: number): string[] {
+  const earliest = date.isToday ? nowMin + SAME_DAY_NOTICE : 0;
+  if (minutesNeeded === null) return toMinutes(CHECK_IN) >= earliest ? [CHECK_IN] : [];
+  return getTimeSlots(minutesNeeded, '15:00', '21:00', earliest);
 }

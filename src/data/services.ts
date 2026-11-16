@@ -224,7 +224,7 @@ export const SERVICES: ServiceItem[] = [
     highlights: [
       'En versión relajación o descontracturante',
       'Zona dorsal, craneal, cuello y rostro',
-      'Para 1, 2 o 3 personas',
+      'Para 3 personas, consulta por WhatsApp',
     ],
     image: './images/masaje-facial.webp',
     tiers: [
@@ -232,8 +232,6 @@ export const SERVICES: ServiceItem[] = [
       { label: '1 persona · Descontracturante', people: 1, price: 24200 },
       { label: '2 personas · Relajación', people: 2, price: 44000 },
       { label: '2 personas · Descontracturante', people: 2, price: 48400 },
-      { label: '3 personas · Relajación', people: 3, price: 66000 },
-      { label: '3 personas · Descontracturante', people: 3, price: 72600 },
     ],
   },
   {
