@@ -31,7 +31,7 @@ export function Footer({ onBook }: { onBook: () => void }) {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={label}
-                  className="grid h-10 w-10 place-items-center rounded-full ring-1 ring-white/15 text-cream transition hover:bg-gold hover:text-forest-deep hover:ring-gold"
+                  className="grid h-11 w-11 place-items-center rounded-full ring-1 ring-white/15 text-cream transition hover:bg-gold hover:text-forest-deep hover:ring-gold"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -41,7 +41,7 @@ export function Footer({ onBook }: { onBook: () => void }) {
 
           <div>
             <p className="eyebrow text-gold">Navegación</p>
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4">
               {[
                 ['#experiencias', 'Experiencias y precios'],
                 ['#alojamiento', 'Cabañas'],
@@ -50,7 +50,7 @@ export function Footer({ onBook }: { onBook: () => void }) {
                 ['#contacto', 'Contacto'],
               ].map(([href, label]) => (
                 <li key={href}>
-                  <a href={href} className="hover:text-cream transition-colors">{label}</a>
+                  <a href={href} className="inline-flex min-h-11 min-w-11 items-center hover:text-cream transition-colors">{label}</a>
                 </li>
               ))}
             </ul>
@@ -59,9 +59,11 @@ export function Footer({ onBook }: { onBook: () => void }) {
           <div>
             <p className="eyebrow text-gold">Contacto</p>
             <ul className="mt-4 space-y-2">
-              <li>{SITE_INFO.phone}</li>
               <li>
-                <a href={`mailto:${SITE_INFO.email}`} className="hover:text-cream transition-colors break-all">{SITE_INFO.email}</a>
+                <a href={`tel:${SITE_INFO.phoneRaw}`} className="inline-flex min-h-11 min-w-11 items-center hover:text-cream transition-colors">{SITE_INFO.phone}</a>
+              </li>
+              <li>
+                <a href={`mailto:${SITE_INFO.email}`} className="inline-flex min-h-11 min-w-11 items-center hover:text-cream transition-colors break-all">{SITE_INFO.email}</a>
               </li>
               <li>{SITE_INFO.shortLocation}</li>
               <li>{SITE_INFO.schedule}</li>

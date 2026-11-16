@@ -27,7 +27,7 @@ export function Gallery() {
               href={SITE_INFO.instagram}
               target="_blank"
               rel="noreferrer"
-              className="btn-outline self-start md:self-auto !py-2.5"
+              className="btn-outline min-h-11 min-w-11 self-start md:self-auto !py-2.5"
             >
               <InstagramIcon className="w-4 h-4" /> @terapiaslapalmilla
             </a>
@@ -50,7 +50,7 @@ export function Gallery() {
                 sizes={i === 0 || i === 5
                   ? '(min-width: 1280px) 600px, (min-width: 768px) calc((100vw - 80px) / 2), (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)'
                   : '(min-width: 1280px) 292px, (min-width: 768px) calc((100vw - 112px) / 4), (min-width: 640px) calc((100vw - 80px) / 2), calc((100vw - 52px) / 2)'}
-                alt={img.caption}
+                alt=""
                 loading="lazy"
                 decoding="async"
                 className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.06]"
@@ -136,7 +136,7 @@ function Lightbox({ index, setIndex }: { index: number; setIndex: (i: number | n
       </div>
 
       <div className="px-5 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-center">
-        <p className="text-sm text-cream/90">{img.caption}</p>
+        <p aria-hidden="true" className="text-sm text-cream/90">{img.caption}</p>
         <div className="no-scrollbar mx-auto mt-4 flex max-w-full justify-start sm:justify-center gap-2 overflow-x-auto">
           {GALLERY_IMAGES.map((g, i) => (
             <button

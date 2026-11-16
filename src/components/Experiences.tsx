@@ -45,7 +45,7 @@ export function Experiences({ onOpen, onBook }: Props) {
                   role="tab"
                   aria-selected={active}
                   onClick={() => change(c.id)}
-                  className={`shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold shadow-sm transition-all duration-300 ${
+                  className={`min-h-11 min-w-11 shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold shadow-sm transition-all duration-300 ${
                     active
                       ? 'bg-forest text-cream'
                       : 'bg-white/90 backdrop-blur text-muted ring-1 ring-line hover:text-forest hover:ring-forest/40'
@@ -53,7 +53,7 @@ export function Experiences({ onOpen, onBook }: Props) {
                 >
                   {c.label}
                   <span
-                    className={`rounded-full px-1.5 text-[10px] tabular-nums ${
+                    className={`rounded-full px-1.5 text-xs tabular-nums ${
                       active ? 'bg-white/15 text-cream' : 'bg-sand text-bark'
                     }`}
                   >

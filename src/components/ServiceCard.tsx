@@ -18,7 +18,6 @@ export function ServiceCard({ service, onOpen, onBook }: Props) {
         type="button"
         onClick={() => onOpen(service)}
         className="relative block aspect-[4/3] overflow-hidden bg-sand text-left"
-        aria-label={`Ver detalle de ${service.name}`}
       >
         <ResponsiveImage
           src={service.image}
@@ -33,7 +32,7 @@ export function ServiceCard({ service, onOpen, onBook }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
         {service.badge && (
           <span
-            className={`absolute left-4 top-4 rounded-full px-3 py-1 text-[11px] font-semibold backdrop-blur-md ${
+            className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-md ${
               off ? 'bg-ink/75 text-cream' : 'bg-cream/90 text-forest'
             }`}
           >
@@ -47,7 +46,7 @@ export function ServiceCard({ service, onOpen, onBook }: Props) {
 
       <div className="flex flex-1 flex-col p-6">
         <h3 className="font-display text-[1.65rem] font-semibold leading-tight text-forest">
-          <button type="button" onClick={() => onOpen(service)} className="text-left hover:text-moss transition-colors">
+          <button type="button" onClick={() => onOpen(service)} className="min-h-11 min-w-11 text-left hover:text-moss transition-colors">
             {service.name}
           </button>
         </h3>
@@ -55,7 +54,7 @@ export function ServiceCard({ service, onOpen, onBook }: Props) {
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-6">
           <div>
-            <span className="block text-[11px] uppercase tracking-[0.16em] text-bark">
+            <span className="block text-xs uppercase tracking-[0.16em] text-bark">
               {service.tiers.length > 1 ? 'Desde' : from.label}
             </span>
             <span className="font-display text-[1.75rem] font-semibold leading-none text-forest">
@@ -64,14 +63,14 @@ export function ServiceCard({ service, onOpen, onBook }: Props) {
           </div>
 
           {off ? (
-            <button type="button" onClick={() => onOpen(service)} className="btn-outline !px-4 !py-2.5 !text-xs">
+            <button type="button" onClick={() => onOpen(service)} className="btn-outline min-h-11 min-w-11 shrink-0 !px-4 !py-2.5 !text-xs">
               Más info
             </button>
           ) : (
             <button
               type="button"
               onClick={() => onBook(service)}
-              className="btn-primary !px-4 !py-2.5 !text-xs group/btn"
+              className="btn-primary min-h-11 min-w-11 shrink-0 !px-4 !py-2.5 !text-xs group/btn"
               aria-label={`Reservar ${service.name}`}
             >
               Reservar

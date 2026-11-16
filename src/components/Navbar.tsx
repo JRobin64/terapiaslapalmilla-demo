@@ -52,7 +52,7 @@ export function Navbar({ onBook }: { onBook: () => void }) {
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-8 h-16 md:h-[72px]">
-          <a href="#inicio" onClick={onSectionClick} className="flex items-center gap-3 group" aria-label="Ir al inicio">
+          <a href="#inicio" onClick={onSectionClick} className="flex min-h-11 min-w-11 items-center gap-3 group" aria-label="Ir al inicio">
             <span
               className={`grid place-items-center rounded-xl transition-all duration-500 ${
                 solid ? 'bg-transparent' : 'bg-cream/90 px-2 py-1 shadow-sm'
@@ -76,7 +76,7 @@ export function Navbar({ onBook }: { onBook: () => void }) {
                 <a
                   key={l.id}
                   href={`#${l.id}`}
-                  className={`relative rounded-full px-3.5 py-2 text-[13px] font-medium transition-colors duration-300 ${
+                  className={`relative inline-flex min-h-11 min-w-11 items-center rounded-full px-3.5 py-2 text-[13px] font-medium transition-colors duration-300 ${
                     solid
                       ? isActive
                         ? 'text-forest'
@@ -98,13 +98,13 @@ export function Navbar({ onBook }: { onBook: () => void }) {
           <div className="flex items-center gap-2">
             <button
               onClick={onBook}
-              className={`hidden sm:inline-flex !px-5 !py-2.5 !text-[13px] ${solid ? 'btn-primary' : 'btn-gold'}`}
+              className={`hidden sm:inline-flex min-h-11 min-w-11 !px-5 !py-2.5 !text-[13px] ${solid ? 'btn-primary' : 'btn-gold'}`}
             >
               Reservar
             </button>
             <button
               onClick={() => setOpen((v) => !v)}
-              className={`md:hidden grid place-items-center h-10 w-10 rounded-full transition-colors ${
+              className={`md:hidden grid place-items-center h-11 w-11 rounded-full transition-colors ${
                 solid ? 'text-forest hover:bg-sand' : 'text-white bg-white/10 backdrop-blur-md'
               }`}
               aria-label={open ? 'Cerrar menú' : 'Abrir menú'}

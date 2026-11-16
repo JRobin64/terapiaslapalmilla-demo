@@ -61,17 +61,17 @@ export function Hero({ onBook }: { onBook: () => void }) {
         <div className="animate-hero-up delay-3 mt-14 sm:mt-20 flex items-end justify-between gap-6 border-t border-white/15 pt-6">
           <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-10 gap-y-4 text-white">
             <div>
-              <dt className="text-[11px] uppercase tracking-[0.2em] text-white/55">Horario</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-white/60">Horario</dt>
               <dd className="mt-1 text-sm font-medium">Jue a Sáb · 15–21 h</dd>
             </div>
             <div>
-              <dt className="text-[11px] uppercase tracking-[0.2em] text-white/55">Tinajas</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-white/60">Tinajas</dt>
               <dd className="mt-1 text-sm font-medium">Desde $44.000</dd>
             </div>
             <div className="col-span-2 sm:col-span-1">
-              <dt className="text-[11px] uppercase tracking-[0.2em] text-white/55">Ubicación</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-white/60">Ubicación</dt>
               <dd className="mt-1 text-sm font-medium">
-                <a href={SITE_INFO.mapsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-gold-soft transition-colors">
+                <a href={SITE_INFO.mapsUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 min-w-11 items-center gap-1.5 hover:text-gold-soft transition-colors">
                   <MapPin className="w-3.5 h-3.5" /> La Palmilla, Rauco
                 </a>
               </dd>
