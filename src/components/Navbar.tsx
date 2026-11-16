@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { SITE_INFO } from '../data/services';
 import { useActiveSection, useScrolled } from '../hooks/useScrolled';
@@ -18,7 +18,21 @@ export function Navbar({ onBook }: { onBook: () => void }) {
   const scrolled = useScrolled(40);
   const active = useActiveSection(IDS);
   const [open, setOpen] = useState(false);
-  useOverlay(open, () => setOpen(false));
+  const closeMenuThen = useOverlay(open, () => setOpen(false));
+
+  const onSectionClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!open || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    const hash = event.currentTarget.hash;
+    closeMenuThen(() => {
+      if (window.location.hash !== hash) window.location.hash = hash;
+      else {
+        document.getElementById(hash.slice(1))?.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        });
+      }
+    });
+  };
 
   useEffect(() => {
     const onResize = () => window.innerWidth >= 768 && setOpen(false);
@@ -38,7 +52,7 @@ export function Navbar({ onBook }: { onBook: () => void }) {
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-8 h-16 md:h-[72px]">
-          <a href="#inicio" className="flex items-center gap-3 group" aria-label="Ir al inicio">
+          <a href="#inicio" onClick={onSectionClick} className="flex items-center gap-3 group" aria-label="Ir al inicio">
             <span
               className={`grid place-items-center rounded-xl transition-all duration-500 ${
                 solid ? 'bg-transparent' : 'bg-cream/90 px-2 py-1 shadow-sm'
@@ -111,7 +125,7 @@ export function Navbar({ onBook }: { onBook: () => void }) {
                 <li key={l.id} className="animate-fade-up" style={{ animationDelay: `${i * 50}ms` }}>
                   <a
                     href={`#${l.id}`}
-                    onClick={() => setOpen(false)}
+                    onClick={onSectionClick}
                     className="flex items-center justify-between border-b border-line py-4 font-display text-[2rem] font-medium text-forest"
                   >
                     {l.label}

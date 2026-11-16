@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Info, X } from 'lucide-react';
 import { CATEGORIES, SERVICES, SITE_INFO, whatsappLink, type ServiceItem } from '../data/services';
 import { useOverlay } from '../hooks/useScrollLock';
@@ -52,8 +52,33 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
+  const contentRef = useRef<HTMLDivElement>(null);
+  const scheduleRef = useRef<HTMLDivElement>(null);
 
   useOverlay(isOpen, onClose);
+
+  useEffect(() => {
+    if (!isOpen || step !== 2 || !dateIso) return;
+    const frame = requestAnimationFrame(() => {
+      const content = contentRef.current;
+      const schedule = scheduleRef.current;
+      if (!content || !schedule) return;
+      const viewport = content.getBoundingClientRect();
+      const target = schedule.getBoundingClientRect();
+      const visibleHeight = Math.min(target.height, content.clientHeight);
+      if (target.top >= viewport.top && target.top + visibleHeight <= viewport.bottom) return;
+
+      // Si el bloque es más alto que el área disponible, mostrar su inicio.
+      const delta = target.top < viewport.top || target.height > content.clientHeight
+        ? target.top - viewport.top
+        : target.bottom - viewport.bottom;
+      content.scrollTo({
+        top: content.scrollTop + delta,
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen, step, dateIso]);
 
   const allDates = useMemo(() => (isOpen ? getUpcomingDates(13) : []), [isOpen]);
   const nowMin = useMemo(() => nowMinutesInChile(), [isOpen, step]);
@@ -190,7 +215,7 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
         </div>
 
         {/* Contenido */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-7 py-6">
+        <div ref={contentRef} className="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-7 py-6">
           <div key={step} className="animate-step">
             {step === 1 && (
               <div className="space-y-7">
@@ -306,7 +331,7 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                   </div>
                 </div>
 
-                <div>
+                <div ref={scheduleRef}>
                   <p className="mb-3 text-sm font-semibold text-forest">{isStay ? 'Horario de la estadía' : 'Hora de inicio'}</p>
                   {isStay ? (
                     <div className="grid grid-cols-2 gap-2">
@@ -377,7 +402,7 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Tu nombre y apellido"
-                    className="w-full rounded-xl bg-white px-4 py-3.5 text-[15px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
+                    className="w-full rounded-xl bg-white px-4 py-3.5 text-[16px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
                   />
                 </label>
                 <label className="block">
@@ -390,7 +415,7 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+56 9 1234 5678"
-                    className="w-full rounded-xl bg-white px-4 py-3.5 text-[15px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
+                    className="w-full rounded-xl bg-white px-4 py-3.5 text-[16px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
                   />
                 </label>
                 <label className="block">
@@ -402,7 +427,7 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Ej: es una celebración, tengo una Gift Card…"
-                    className="w-full resize-none rounded-xl bg-white px-4 py-3 text-[15px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
+                    className="w-full resize-none rounded-xl bg-white px-4 py-3 text-[16px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
                   />
                 </label>
               </div>
