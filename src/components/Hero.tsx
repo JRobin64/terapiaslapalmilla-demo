@@ -27,7 +27,7 @@ export function Hero({ onBook }: { onBook: () => void }) {
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8 pb-10 sm:pb-16 pt-32">
         <div className="max-w-3xl">
-          <div className="animate-fade-up inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md">
+          <div className="animate-hero-up inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md">
             <span
               className={`h-2 w-2 rounded-full ${
                 status.isOpen ? 'bg-emerald-400 animate-pulse-dot' : 'bg-gold'
@@ -36,18 +36,18 @@ export function Hero({ onBook }: { onBook: () => void }) {
             {status.label}
           </div>
 
-          <h1 className="animate-fade-up delay-1 mt-6 font-display text-[3.25rem] leading-[0.95] sm:text-7xl lg:text-[6.5rem] font-medium tracking-tight text-white">
+          <h1 className="animate-hero-up delay-1 mt-6 font-display text-[3.25rem] leading-[0.95] sm:text-7xl lg:text-[6.5rem] font-medium tracking-tight text-white">
             Haz una pausa
             <br />
             <span className="italic text-gold-soft">en tu agitada vida.</span>
           </h1>
 
-          <p className="animate-fade-up delay-2 mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-white/80">
+          <p className="animate-hero-up delay-2 mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-white/80">
             Tinajas de agua caliente al aire libre, masajes en sala termorregulada y cabañas
             con tinaja privada. Un refugio natural a 5 km de Rauco.
           </p>
 
-          <div className="animate-fade-up delay-3 mt-9 flex flex-col sm:flex-row gap-3">
+          <div className="animate-hero-up delay-3 mt-9 flex flex-col sm:flex-row gap-3">
             <button onClick={onBook} className="btn-gold !px-8 !py-4 text-[15px] group">
               Reservar experiencia
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -58,7 +58,7 @@ export function Hero({ onBook }: { onBook: () => void }) {
           </div>
         </div>
 
-        <div className="animate-fade-up delay-3 mt-14 sm:mt-20 flex items-end justify-between gap-6 border-t border-white/15 pt-6">
+        <div className="animate-hero-up delay-3 mt-14 sm:mt-20 flex items-end justify-between gap-6 border-t border-white/15 pt-6">
           <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-10 gap-y-4 text-white">
             <div>
               <dt className="text-[11px] uppercase tracking-[0.2em] text-white/55">Horario</dt>
