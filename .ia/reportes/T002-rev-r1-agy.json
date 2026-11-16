@@ -1,0 +1,6 @@
+{
+  "problemas": [],
+  "resumen": "Revisión aprobada de T002. Los textos de la portada usan `animate-hero-up` animando solo `transform` sin ocultar elementos con `opacity: 0` ni alterar `animate-fade-up` en el menú móvil; Google Fonts carga de forma no bloqueante con `rel=\"preload\" as=\"style\"`, `onload` y respaldo `<noscript>` conservando familias, pesos y `display=swap`; se mantienen el `preload` y `fetchPriority=\"high\"` de la imagen hero, así como `prefers-reduced-motion` (con `animation: none` en `.animate-hero-up`). `npx tsc -b` y `npm run build` ejecutados sin errores.",
+  "veredicto": "APROBADO",
+  "commit": "d40deeda4713227bb8ec3513a2fb5f8e69011efb"
+}
