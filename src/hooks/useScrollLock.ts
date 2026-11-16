@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef } from 'react';
 
 let locks = 0;
 let historyEntryId = 0;
+// Prefijo único por carga de página: tras recargar, las entradas antiguas del historial no se confunden con las nuevas.
+// (Sin crypto.randomUUID: no existe en Safari iOS < 15.4 ni fuera de contexto seguro.)
+const HISTORY_PREFIX = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 const HISTORY_KEY = '__lpOverlay';
 type Overlay = { current: (() => void) | undefined };
 const overlays: Overlay[] = [];
@@ -37,7 +40,7 @@ function syncHistory() {
   }
 
   while (historyEntries.length < overlays.length) {
-    const id = String(++historyEntryId);
+    const id = `${HISTORY_PREFIX}-${++historyEntryId}`;
     window.history.pushState({ ...window.history.state, [HISTORY_KEY]: id }, '');
     historyEntries.push(id);
   }
