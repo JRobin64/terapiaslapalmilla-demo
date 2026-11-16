@@ -1,0 +1,13 @@
+{
+  "problemas": [
+    {
+      "archivo": "src/components/Gallery.tsx",
+      "descripcion": "En el Lightbox (línea 120), ResponsiveImage agrega los atributos width={width} y height={height}, pero el className ('animate-fade-in max-h-full max-w-full rounded-2xl object-contain shadow-2xl') no incluye w-auto. El preflight de Tailwind aplica height: auto pero deja width usando el atributo HTML (1200 o 1600 px, acotado por max-w-full). En viewports más anchos que 3:2 respecto al alto disponible (p. ej. 1280x720 o 1440x800), max-h-full acota el alto sin reducir proporcionalmente el ancho de la caja <img>, por lo que rounded-2xl y shadow-2xl envuelven franjas vacías a los lados de la foto y hacer clic en esos márgenes laterales activa stopPropagation() en vez de cerrar el visor. Añadir w-auto corrige el comportamiento.",
+      "linea": 120,
+      "severidad": "importante"
+    }
+  ],
+  "resumen": "Revisión de T004: scripts/imagenes.py es idempotente, no amplía imágenes pequeñas y genera 24 variantes WebP acordes a imageMetadata.ts; ResponsiveImage, sizes, las miniaturas (-640.webp) y los width/height de las tarjetas y logos cumplen los criterios; npx tsc -b y npm run build pasan sin errores. Sin embargo, falta w-auto en la imagen principal del Lightbox en src/components/Gallery.tsx, lo que altera la caja del <img> (sombra, bordes redondeados y área de clic) al limitar por alto.",
+  "veredicto": "CAMBIOS",
+  "commit": "1d19df410cc7bf004fbc2704aca5f160fc089a63"
+}
