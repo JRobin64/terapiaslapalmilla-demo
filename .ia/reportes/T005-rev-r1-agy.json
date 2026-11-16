@@ -1,0 +1,6 @@
+{
+  "problemas": [],
+  "resumen": "Revisión completada sobre ia/T005 respecto a 4a39fe59a4e46493993ab4e125fe638dd10e4e09. Todos los criterios de aceptación están cumplidos: áreas táctiles de al menos 44×44 px (min-h-11/min-w-11 y h-11/w-11) en los componentes del alcance, enlaces tel:+56998252628 mediante SITE_INFO.phoneRaw en Contact.tsx y Footer.tsx, textos elevados a >=12 px (incluyendo eyebrow en src/index.css y etiquetas dt en Hero.tsx), eliminación de aria-label conflictivo en el botón-imagen de ServiceCard.tsx, y prevención de alt redundante en Gallery.tsx (alt=\"\" en miniaturas de cuadrícula y aria-hidden=\"true\" en el pie de foto del Lightbox). Verificado localmente con npx tsc -b y npm run build (código 0, sin errores) y git diff --check limpio.",
+  "veredicto": "APROBADO",
+  "commit": "f9c320607b60f5f1dfa6948b2a918390e67d03d9"
+}
