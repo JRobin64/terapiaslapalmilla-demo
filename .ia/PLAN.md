@@ -27,7 +27,8 @@ Reparto pedido por el usuario: implementa codex, revisa agy. Fuera de alcance: c
 | T003 | Overlays: botón atrás, zoom iOS y salto a horarios | — | codex | agy | integrada |
 | T004 | Imágenes responsivas para celular | T002 | codex | agy | integrada |
 | T005 | Botones táctiles, llamada y accesibilidad | T003, T004 | codex | agy | integrada |
-| T006 | Prerenderizado del HTML en el build | T005 | codex | agy | en-curso |
+| T006 | Prerenderizado del HTML en el build | T005 | codex | agy | revision |
+| T007 | Fuentes servidas desde el propio sitio | T006 | codex | agy | pendiente |
 
 Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqueada)
 
@@ -39,3 +40,4 @@ Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqu
 - 2026-11-16 — Medición tras T004 (local): imágenes sobredimensionadas 760 → 184 KiB; LCP sigue en 4,2 s por render delay del JS (el HTML llega vacío). Se añade T006 (prerender).
 - 2026-11-16 — T004 r1 codex, agy CAMBIOS (w-auto en visor); r2 codex, agy APROBADO. Integrada.
 - 2026-11-16 — T005 r1 codex (+ ajuste del coordinador en Hero), agy APROBADO. Táctiles < 44 px: 34 → 0; textos < 12 px: 26 → 0. Integrada.
+- 2026-11-16 — T006: prerender OK (LCP observado 59 ms), pero el LCP simulado sigue en 4,1 s por la cadena de Google Fonts. Se añade T007.
