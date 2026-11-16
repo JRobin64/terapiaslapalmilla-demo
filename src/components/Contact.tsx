@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { ArrowUpRight, Clock, Mail, MapPin, Navigation, Phone } from 'lucide-react';
 import { SITE_INFO, WEEK_SCHEDULE, whatsappLink } from '../data/services';
-import { getOpenStatus } from '../lib/time';
+import { getOpenStatus, type OpenStatus } from '../lib/time';
 import { trackGAEvent } from '../utils/analytics';
 import { SectionHeading } from './ui/Section';
 import { WhatsAppIcon } from './ui/BrandIcons';
@@ -9,7 +10,14 @@ import { WhatsAppIcon } from './ui/BrandIcons';
 const ORDER = [1, 2, 3, 4, 5, 6, 0];
 
 export function Contact() {
-  const status = getOpenStatus();
+  const [status, setStatus] = useState<OpenStatus | null>(null);
+
+  useEffect(() => {
+    setStatus(getOpenStatus());
+    const t = window.setInterval(() => setStatus(getOpenStatus()), 60_000);
+    return () => window.clearInterval(t);
+  }, []);
+
   return (
     <section id="contacto" className="py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -85,16 +93,16 @@ export function Contact() {
                 </span>
                 <span
                   className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    status.isOpen ? 'bg-emerald-50 text-emerald-700' : 'bg-sand text-bark'
+                    status?.isOpen ? 'bg-emerald-50 text-emerald-700' : 'bg-sand text-bark'
                   }`}
                 >
-                  {status.isOpen ? 'Abierto ahora' : 'Cerrado ahora'}
+                  {status ? (status.isOpen ? 'Abierto ahora' : 'Cerrado ahora') : 'Jue a Sáb · 15–21 h'}
                 </span>
               </div>
               <ul className="mt-4 space-y-1.5 text-sm">
                 {ORDER.map((d) => {
                   const s = WEEK_SCHEDULE[d];
-                  const today = d === status.today;
+                  const today = d === status?.today;
                   return (
                     <li
                       key={s.day}

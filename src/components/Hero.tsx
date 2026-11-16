@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, ChevronDown, MapPin } from 'lucide-react';
 import { SITE_INFO } from '../data/services';
-import { getOpenStatus } from '../lib/time';
+import { getOpenStatus, type OpenStatus } from '../lib/time';
 
 export function Hero({ onBook }: { onBook: () => void }) {
-  const [status, setStatus] = useState(getOpenStatus);
+  const [status, setStatus] = useState<OpenStatus | null>(null);
 
   useEffect(() => {
+    setStatus(getOpenStatus());
     const t = window.setInterval(() => setStatus(getOpenStatus()), 60_000);
     return () => window.clearInterval(t);
   }, []);
@@ -30,10 +31,10 @@ export function Hero({ onBook }: { onBook: () => void }) {
           <div className="animate-hero-up inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md">
             <span
               className={`h-2 w-2 rounded-full ${
-                status.isOpen ? 'bg-emerald-400 animate-pulse-dot' : 'bg-gold'
+                status?.isOpen ? 'bg-emerald-400 animate-pulse-dot' : 'bg-gold'
               }`}
             />
-            {status.label}
+            {status?.label ?? 'Jue a Sáb · 15–21 h'}
           </div>
 
           <h1 className="animate-hero-up delay-1 mt-6 font-display text-[3.25rem] leading-[0.95] sm:text-7xl lg:text-[6.5rem] font-medium tracking-tight text-white">

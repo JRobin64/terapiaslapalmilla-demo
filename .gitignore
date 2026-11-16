@@ -11,5 +11,6 @@ __pycache__/
 node_modules/
 .pytest_cache/
 dist/
+dist-ssr/
 build/
 *.tsbuildinfo
