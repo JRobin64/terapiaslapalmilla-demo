@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import {
-  X,
-  Calendar,
-  Clock,
-  Users,
-  CheckCircle2,
-  MessageCircle,
-  ArrowRight,
-  ArrowLeft,
-} from 'lucide-react';
-import { SERVICES, ServiceItem, SITE_INFO } from '../data/services';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Info, X } from 'lucide-react';
+import { CATEGORIES, SERVICES, SITE_INFO, whatsappLink, type ServiceItem } from '../data/services';
+import { useOverlay } from '../hooks/useScrollLock';
+import { getTimeSlots, getUpcomingDates } from '../lib/time';
 import { formatClp, trackGAEvent } from '../utils/analytics';
+import { WhatsAppIcon } from './ui/BrandIcons';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -18,386 +12,437 @@ interface BookingModalProps {
   onClose: () => void;
 }
 
-const AVAILABLE_DAYS = ['Jueves', 'Viernes', 'Sábado'];
+type Step = 1 | 2 | 3 | 4;
 
-export const BookingModal: React.FC<BookingModalProps> = ({
-  isOpen,
-  initialService,
-  onClose,
-}) => {
-  const bookableServices = SERVICES.filter((s) => !s.temporarilyUnavailable);
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [selectedService, setSelectedService] = useState<ServiceItem>(
-    initialService && !initialService.temporarilyUnavailable
-      ? initialService
-      : bookableServices[0]
-  );
+const STEP_TITLES: Record<Step, string> = {
+  1: '¿Qué te gustaría vivir?',
+  2: '¿Cuándo vienes?',
+  3: 'Tus datos',
+  4: '¡Solicitud lista!',
+};
+
+const BOOKABLE = SERVICES.filter((s) => !s.temporarilyUnavailable);
+const STORAGE_KEY = 'lp-booking-contact';
+
+function loadContact(): { name: string; phone: string } {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    /* sin almacenamiento disponible */
+  }
+  return { name: '', phone: '' };
+}
+
+function saveContact(name: string, phone: string) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ name, phone }));
+  } catch {
+    /* ignorar */
+  }
+}
+
+export function BookingModal({ isOpen, initialService, onClose }: BookingModalProps) {
+  const [step, setStep] = useState<Step>(1);
+  const [service, setService] = useState<ServiceItem | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(true);
   const [tierIndex, setTierIndex] = useState(0);
-  const [selectedDay, setSelectedDay] = useState('Sábado');
-  const [preferredTime, setPreferredTime] = useState('17:00');
-  const [guestName, setGuestName] = useState('');
-  const [guestPhone, setGuestPhone] = useState('');
+  const [dateIso, setDateIso] = useState<string | null>(null);
+  const [time, setTime] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
 
+  useOverlay(isOpen, onClose);
+
+  const dates = useMemo(() => (isOpen ? getUpcomingDates(12) : []), [isOpen]);
+
+  // Reiniciar al abrir
   useEffect(() => {
-    if (isOpen) {
-      const target =
-        initialService && !initialService.temporarilyUnavailable
-          ? initialService
-          : bookableServices[0];
-      setSelectedService(target);
-      setTierIndex(0);
-      setStep(1);
-      trackGAEvent('begin_checkout', {
-        item_name: target.name,
-        currency: 'CLP',
-        value: target.tiers[0].price,
-      });
-    }
+    if (!isOpen) return;
+    const target = initialService && !initialService.temporarilyUnavailable ? initialService : null;
+    const contact = loadContact();
+    setService(target);
+    setPickerOpen(!target);
+    setTierIndex(0);
+    setDateIso(null);
+    setTime(null);
+    setNotes('');
+    setName(contact.name);
+    setPhone(contact.phone);
+    setStep(1);
+    trackGAEvent('begin_checkout', {
+      item_name: target?.name ?? 'sin_seleccion',
+      currency: 'CLP',
+      value: target?.tiers[0].price ?? 0,
+    });
   }, [isOpen, initialService]);
 
   if (!isOpen) return null;
 
-  const isCabin = selectedService.id.startsWith('alojamiento');
-  const activeTier = selectedService.tiers[tierIndex] || selectedService.tiers[0];
-  const totalClp = activeTier.price;
+  const isStay = service?.minutes === null;
+  const tier = service ? service.tiers[tierIndex] ?? service.tiers[0] : null;
+  const slots = service && service.minutes ? getTimeSlots(service.minutes) : [];
+  const date = dates.find((d) => d.iso === dateIso) ?? null;
+  const timeLabel = isStay ? '18:00 hrs (check-in)' : time ? `${time} hrs` : '';
 
-  const handleGoToStep3 = () => {
-    trackGAEvent('select_schedule', {
-      day: selectedDay,
-      time_slot: isCabin ? '18:00 hrs' : `${preferredTime} hrs`,
-    });
-    setStep(3);
+  const canNext =
+    (step === 1 && !!service && !!tier) ||
+    (step === 2 && !!date && (isStay || !!time)) ||
+    (step === 3 && name.trim().length > 1 && phone.replace(/\D/g, '').length >= 8);
+
+  const selectService = (s: ServiceItem) => {
+    if (s.id !== service?.id) {
+      setTierIndex(0);
+      setTime(null);
+    }
+    setService(s);
+    setPickerOpen(false);
+    trackGAEvent('view_item', { item_name: s.name, currency: 'CLP', value: s.tiers[0].price });
   };
 
-  const handleConfirm = (e: React.FormEvent) => {
-    e.preventDefault();
-    const timeLabel = isCabin ? '18:00 hrs (Check-in)' : `${preferredTime} hrs`;
-    trackGAEvent('generate_lead', {
-      item_name: selectedService.name,
-      tier: activeTier.label,
-      schedule: `${selectedDay} ${timeLabel}`,
-      currency: 'CLP',
-      value: totalClp,
-    });
-    setStep(4);
+  const message = () =>
+    [
+      'Hola Terapias La Palmilla! Quisiera reservar:',
+      `• Servicio: ${service?.name}`,
+      `• Modalidad: ${tier?.label}`,
+      `• Fecha: ${date?.long}`,
+      `• Hora: ${timeLabel}`,
+      `• Valor: ${tier ? formatClp(tier.price) : ''}`,
+      `• Nombre: ${name.trim()}`,
+      `• Teléfono: ${phone.trim()}`,
+      notes.trim() ? `• Comentarios: ${notes.trim()}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+  const next = (e?: FormEvent) => {
+    e?.preventDefault();
+    if (!canNext) return;
+    if (step === 1) setStep(2);
+    else if (step === 2) {
+      trackGAEvent('select_schedule', { day: date?.iso ?? '', time_slot: timeLabel });
+      setStep(3);
+    } else if (step === 3) {
+      saveContact(name.trim(), phone.trim());
+      trackGAEvent('generate_lead', {
+        item_name: service?.name ?? '',
+        tier: tier?.label ?? '',
+        schedule: `${date?.iso} ${timeLabel}`,
+        currency: 'CLP',
+        value: tier?.price ?? 0,
+      });
+      trackGAEvent('contact_whatsapp', { source: 'booking_modal', item_name: service?.name ?? '' });
+      window.open(whatsappLink(message()), '_blank', 'noopener');
+      setStep(4);
+    }
   };
 
-  const whatsappMessage = encodeURIComponent(
-    `Hola Terapias La Palmilla! Quisiera consultar disponibilidad y reservar:\n` +
-      `• Servicio: ${selectedService.name}\n` +
-      `• Modalidad: ${activeTier.label}\n` +
-      `• Día y hora preferida: ${selectedDay} a las ${
-        isCabin ? '18:00 hrs (Check-in)' : `${preferredTime} hrs`
-      }\n` +
-      `• Valor de referencia: ${formatClp(totalClp)}\n` +
-      `• Nombre: ${guestName || 'Por confirmar'}\n` +
-      `• Teléfono: ${guestPhone || 'Por confirmar'}` +
-      (notes ? `\n• Notas: ${notes}` : '')
-  );
+  const back = () => setStep((s) => (s > 1 ? ((s - 1) as Step) : s));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#14221B]/70 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#F7F4EE] text-[#1C2822] shadow-2xl border border-[#DED8CC]">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E4DEC9] bg-[#F7F4EE]/95 backdrop-blur-md px-6 py-5">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#7D6E5D]">
-              Solicitud de Reserva · Rauco
-            </p>
-            <h3 className="font-display text-2xl font-semibold text-[#1E352B]">
-              Selecciona tu servicio
-            </h3>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-labelledby="booking-title">
+      <div className="absolute inset-0 bg-forest-deep/60 backdrop-blur-sm animate-fade-in" onClick={onClose} />
+
+      <form
+        onSubmit={next}
+        className="animate-panel relative flex max-h-[94svh] w-full flex-col overflow-hidden rounded-t-[2rem] bg-cream shadow-2xl sm:max-h-[88vh] sm:max-w-xl sm:rounded-[2rem]"
+      >
+        {/* Encabezado */}
+        <div className="shrink-0 px-5 sm:px-7 pt-3 sm:pt-6">
+          <span className="mx-auto mb-3 block h-1 w-10 rounded-full bg-line sm:hidden" />
+          <div className="flex items-center gap-3">
+            {step > 1 && step < 4 ? (
+              <button type="button" onClick={back} className="grid h-10 w-10 shrink-0 place-items-center rounded-full ring-1 ring-line text-forest hover:bg-sand transition" aria-label="Volver">
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+            ) : null}
+            <div className="min-w-0 flex-1">
+              {step < 4 && <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bark">Paso {step} de 3</p>}
+              <h2 id="booking-title" className="font-display text-[1.9rem] font-semibold leading-tight text-forest">
+                {STEP_TITLES[step]}
+              </h2>
+            </div>
+            <button type="button" onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted hover:bg-sand transition" aria-label="Cerrar reserva">
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Cerrar reserva"
-            className="rounded-full p-2 text-[#5B665F] hover:bg-[#EAE4D7] transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {step < 4 && (
-          <div className="flex items-center gap-2 px-6 pt-4 text-xs font-medium text-[#6B756E]">
-            <span className={step === 1 ? 'text-[#1E352B] font-semibold' : ''}>
-              1. Servicio
-            </span>
-            <span>/</span>
-            <span className={step === 2 ? 'text-[#1E352B] font-semibold' : ''}>
-              2. Día y Horario
-            </span>
-            <span>/</span>
-            <span className={step === 3 ? 'text-[#1E352B] font-semibold' : ''}>
-              3. Datos y WhatsApp
-            </span>
-          </div>
-        )}
-
-        <div className="p-6 space-y-6">
-          {step === 1 && (
-            <div className="space-y-5">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B665F] mb-2">
-                  Servicio
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {bookableServices.map((srv) => (
-                    <button
-                      key={srv.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedService(srv);
-                        setTierIndex(0);
-                      }}
-                      className={`text-left p-3.5 rounded-2xl border transition ${
-                        selectedService.id === srv.id
-                          ? 'border-[#1E352B] bg-[#1E352B] text-[#F7F4EE]'
-                          : 'border-[#DED8CC] bg-white hover:border-[#9CA89F]'
-                      }`}
-                    >
-                      <div className="text-sm font-semibold">{srv.name}</div>
-                      <div
-                        className={`text-xs mt-0.5 ${
-                          selectedService.id === srv.id ? 'text-[#D3DDD6]' : 'text-[#6B756E]'
-                        }`}
-                      >
-                        Desde {formatClp(srv.tiers[0].price)} · {srv.duration}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B665F] mb-2">
-                  <Users className="inline w-3.5 h-3.5 mr-1 -mt-0.5" />
-                  Cantidad de personas / modalidad
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {selectedService.tiers.map((tier, idx) => (
-                    <button
-                      key={tier.label}
-                      type="button"
-                      onClick={() => setTierIndex(idx)}
-                      className={`px-4 py-2.5 rounded-xl text-sm font-medium border transition ${
-                        tierIndex === idx
-                          ? 'border-[#B87A56] bg-[#B87A56] text-white'
-                          : 'border-[#DED8CC] bg-white text-[#1C2822] hover:border-[#B87A56]'
-                      }`}
-                    >
-                      {tier.label} — {formatClp(tier.price)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-[#E4DEC9]">
-                <div>
-                  <span className="text-xs text-[#6B756E] block">Valor del servicio</span>
-                  <span className="font-display text-3xl font-semibold text-[#1E352B]">
-                    {formatClp(totalClp)}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#1E352B] px-6 py-3 text-sm font-semibold text-[#F7F4EE] hover:bg-[#2B4B3D] transition"
-                >
-                  Elegir día <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+          {step < 4 && (
+            <div className="mt-4 grid grid-cols-3 gap-1.5">
+              {[1, 2, 3].map((n) => (
+                <span key={n} className="h-1 overflow-hidden rounded-full bg-line">
+                  <span className={`block h-full rounded-full bg-forest transition-all duration-500 ${n <= step ? 'w-full' : 'w-0'}`} />
+                </span>
+              ))}
             </div>
           )}
+        </div>
 
-          {step === 2 && (
-            <div className="space-y-5">
-              <div className="rounded-2xl bg-[#EAE4D7]/60 p-4 text-xs text-[#4C5851]">
-                Horario de atención habitual: <strong>{SITE_INFO.schedule}</strong> ({SITE_INFO.closedDays}).
-                Se admiten únicamente personas mayores de 15 años.
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B665F] mb-2">
-                  <Calendar className="inline w-3.5 h-3.5 mr-1 -mt-0.5" />
-                  Día preferido
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {AVAILABLE_DAYS.map((day) => (
-                    <button
-                      key={day}
-                      type="button"
-                      onClick={() => setSelectedDay(day)}
-                      className={`py-3 rounded-xl border text-sm font-semibold transition ${
-                        selectedDay === day
-                          ? 'border-[#1E352B] bg-[#1E352B] text-white'
-                          : 'border-[#DED8CC] bg-white hover:border-[#1E352B]'
-                      }`}
-                    >
-                      {day}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B665F] mb-2">
-                  <Clock className="inline w-3.5 h-3.5 mr-1 -mt-0.5" />
-                  Horario
-                </label>
-                {isCabin ? (
-                  <div className="p-4 rounded-xl border border-[#1E352B] bg-[#EDF2EE] text-sm font-medium text-[#1E352B]">
-                    Ingreso (Check-in): <strong>18:00 hrs</strong> · Check-out día siguiente:{' '}
-                    <strong>12:00 hrs</strong> (desayuno incluido)
-                  </div>
+        {/* Contenido */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-7 py-6">
+          <div key={step} className="animate-step">
+            {step === 1 && (
+              <div className="space-y-7">
+                {/* Servicio seleccionado / selector */}
+                {service && !pickerOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setPickerOpen(true)}
+                    className="flex w-full items-center gap-4 rounded-2xl bg-white p-3 pr-4 text-left ring-2 ring-forest"
+                  >
+                    <img src={service.image} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-semibold text-forest">{service.name}</span>
+                      <span className="block text-xs text-muted">{service.duration}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-bark">
+                      Cambiar <ChevronDown className="w-3.5 h-3.5" />
+                    </span>
+                  </button>
                 ) : (
-                  <div className="space-y-2">
-                    <input
-                      type="time"
-                      min="15:00"
-                      max="20:00"
-                      value={preferredTime}
-                      onChange={(e) => setPreferredTime(e.target.value)}
-                      className="w-full sm:w-48 rounded-xl border border-[#DED8CC] bg-white px-4 py-2.5 text-sm font-semibold text-[#1E352B] focus:border-[#1E352B] focus:outline-none"
-                    />
-                    <p className="text-xs text-[#6B756E]">
-                      Indica tu hora de llegada estimada (atención entre 15:00 y 21:00 hrs;
-                      sujeto a confirmación vía WhatsApp).
-                    </p>
+                  <div className="space-y-5">
+                    {CATEGORIES.filter((c) => c.id !== 'all').map((c) => {
+                      const items = BOOKABLE.filter((s) => s.category === c.id);
+                      if (!items.length) return null;
+                      return (
+                        <div key={c.id}>
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-bark">{c.label}</p>
+                          <div className="space-y-2">
+                            {items.map((s) => {
+                              const sel = s.id === service?.id;
+                              return (
+                                <button
+                                  key={s.id}
+                                  type="button"
+                                  onClick={() => selectService(s)}
+                                  className={`flex w-full items-center gap-3.5 rounded-2xl bg-white p-2.5 pr-4 text-left transition ring-1 ${
+                                    sel ? 'ring-2 ring-forest' : 'ring-line hover:ring-forest/40'
+                                  }`}
+                                >
+                                  <img src={s.image} alt="" loading="lazy" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                                  <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-semibold text-forest">{s.name}</span>
+                                    <span className="block text-xs text-muted">{s.duration}</span>
+                                  </span>
+                                  <span className="text-right text-xs text-muted">
+                                    {s.tiers.length > 1 ? 'desde' : s.tiers[0].label}
+                                    <span className="block text-sm font-semibold text-forest tabular-nums">{formatClp(s.tiers[0].price)}</span>
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {service && !pickerOpen && (
+                  <div className="animate-step">
+                    <p className="mb-3 text-sm font-semibold text-forest">¿Para cuántas personas?</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {service.tiers.map((t, i) => {
+                        const sel = i === tierIndex;
+                        return (
+                          <button
+                            key={t.label}
+                            type="button"
+                            onClick={() => setTierIndex(i)}
+                            className={`relative rounded-2xl p-3.5 text-left transition ${
+                              sel ? 'bg-forest text-cream' : 'bg-white ring-1 ring-line hover:ring-forest/40'
+                            }`}
+                          >
+                            <span className={`block text-[13px] ${sel ? 'text-sage' : 'text-muted'}`}>{t.label}</span>
+                            <span className="block text-base font-semibold tabular-nums">{formatClp(t.price)}</span>
+                            {sel && <Check className="absolute right-3 top-3 w-4 h-4 text-gold" strokeWidth={3} />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
+            )}
 
-              <div className="flex items-center justify-between pt-4 border-t border-[#E4DEC9]">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#5B665F] hover:text-[#1C2822]"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Volver
-                </button>
-                <button
-                  type="button"
-                  onClick={handleGoToStep3}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#1E352B] px-6 py-3 text-sm font-semibold text-[#F7F4EE] hover:bg-[#2B4B3D] transition"
-                >
-                  Continuar <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <form onSubmit={handleConfirm} className="space-y-4">
-              <div className="rounded-2xl bg-white border border-[#DED8CC] p-4 space-y-1.5">
-                <div className="text-xs uppercase tracking-wider text-[#7D6E5D]">Resumen</div>
-                <div className="font-semibold text-[#1E352B]">
-                  {selectedService.name} — {activeTier.label}
-                </div>
-                <div className="text-sm text-[#4C5851]">
-                  {selectedDay} · {isCabin ? '18:00 hrs (Check-in)' : `${preferredTime} hrs`}
-                </div>
-                <div className="text-lg font-bold text-[#B87A56] pt-1">
-                  Valor: {formatClp(totalClp)}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {step === 2 && service && (
+              <div className="space-y-7">
                 <div>
-                  <label className="block text-xs font-medium text-[#5B665F] mb-1">
-                    Nombre completo *
-                  </label>
+                  <p className="mb-3 text-sm font-semibold text-forest">Elige una fecha</p>
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                    {dates.map((d) => {
+                      const sel = d.iso === dateIso;
+                      return (
+                        <button
+                          key={d.iso}
+                          type="button"
+                          onClick={() => setDateIso(d.iso)}
+                          className={`flex flex-col items-center rounded-2xl py-2.5 transition ${
+                            sel ? 'bg-forest text-cream' : 'bg-white ring-1 ring-line hover:ring-forest/40 text-ink'
+                          }`}
+                          aria-label={d.long}
+                          aria-pressed={sel}
+                        >
+                          <span className={`text-[11px] font-medium uppercase ${sel ? 'text-gold-soft' : 'text-bark'}`}>{d.weekday}</span>
+                          <span className="font-display text-2xl font-semibold leading-tight">{d.dayNum}</span>
+                          <span className={`text-[11px] ${sel ? 'text-sage' : 'text-muted'}`}>{d.month}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="mb-3 text-sm font-semibold text-forest">{isStay ? 'Horario de la estadía' : 'Hora de inicio'}</p>
+                  {isStay ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="rounded-2xl bg-white p-4 ring-1 ring-line">
+                        <span className="block text-xs text-muted">Check-in</span>
+                        <span className="font-display text-2xl font-semibold text-forest">18:00</span>
+                      </div>
+                      <div className="rounded-2xl bg-white p-4 ring-1 ring-line">
+                        <span className="block text-xs text-muted">Check-out (día siguiente)</span>
+                        <span className="font-display text-2xl font-semibold text-forest">12:00</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-4 gap-2">
+                      {slots.map((t) => {
+                        const sel = t === time;
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setTime(t)}
+                            aria-pressed={sel}
+                            className={`rounded-xl py-2.5 text-sm font-semibold tabular-nums transition ${
+                              sel ? 'bg-forest text-cream' : 'bg-white ring-1 ring-line hover:ring-forest/40 text-ink'
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <p className="flex gap-2.5 rounded-2xl bg-sand p-4 text-xs leading-relaxed text-muted">
+                  <Info className="mt-0.5 w-4 h-4 shrink-0 text-bark" />
+                  <span>
+                    Atendemos {SITE_INFO.schedule.toLowerCase()}. La disponibilidad final te la
+                    confirmamos por WhatsApp. Solo mayores de 15 años.
+                  </span>
+                </p>
+              </div>
+            )}
+
+            {step === 3 && service && tier && (
+              <div className="space-y-5">
+                <dl className="divide-y divide-line rounded-2xl bg-white text-sm ring-1 ring-line">
+                  {[
+                    ['Experiencia', service.name],
+                    ['Modalidad', tier.label],
+                    ['Fecha', date?.long ?? ''],
+                    ['Hora', timeLabel],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex justify-between gap-4 px-4 py-3">
+                      <dt className="text-muted">{k}</dt>
+                      <dd className="text-right font-medium text-forest first-letter:uppercase">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-semibold text-forest">Nombre</span>
                   <input
                     required
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
-                    placeholder="Ej. Camila Rojas"
-                    className="w-full rounded-xl border border-[#DED8CC] bg-white px-3.5 py-2.5 text-sm focus:border-[#1E352B] focus:outline-none"
+                    autoComplete="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Tu nombre y apellido"
+                    className="w-full rounded-xl bg-white px-4 py-3.5 text-[15px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
                   />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#5B665F] mb-1">
-                    Teléfono / WhatsApp *
-                  </label>
-                  <input
-                    required
-                    value={guestPhone}
-                    onChange={(e) => setGuestPhone(e.target.value)}
-                    placeholder="+56 9 ..."
-                    className="w-full rounded-xl border border-[#DED8CC] bg-white px-3.5 py-2.5 text-sm focus:border-[#1E352B] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-[#5B665F] mb-1">
-                  Comentarios (opcional)
                 </label>
-                <textarea
-                  rows={2}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Consultas adicionales..."
-                  className="w-full rounded-xl border border-[#DED8CC] bg-white px-3.5 py-2 text-sm focus:border-[#1E352B] focus:outline-none"
-                />
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-semibold text-forest">Teléfono / WhatsApp</span>
+                  <input
+                    required
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+56 9 1234 5678"
+                    className="w-full rounded-xl bg-white px-4 py-3.5 text-[15px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-semibold text-forest">
+                    Comentarios <span className="font-normal text-muted">(opcional)</span>
+                  </span>
+                  <textarea
+                    rows={2}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Ej: es una celebración, tengo una Gift Card…"
+                    className="w-full resize-none rounded-xl bg-white px-4 py-3 text-[15px] ring-1 ring-line outline-none transition focus:ring-2 focus:ring-forest"
+                  />
+                </label>
               </div>
+            )}
 
-              <div className="flex items-center justify-between pt-4 border-t border-[#E4DEC9]">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#5B665F] hover:text-[#1C2822]"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Volver
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#1E352B] px-6 py-3 text-sm font-semibold text-[#F7F4EE] hover:bg-[#2B4B3D] transition"
-                >
-                  Preparar WhatsApp <CheckCircle2 className="w-4 h-4" />
-                </button>
-              </div>
-            </form>
-          )}
-
-          {step === 4 && (
-            <div className="text-center py-6 space-y-4">
-              <div className="mx-auto w-14 h-14 rounded-full bg-[#1E352B]/10 flex items-center justify-center text-[#1E352B]">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <h4 className="font-display text-3xl font-semibold text-[#1E352B]">
-                Resumen listo para enviar
-              </h4>
-              <p className="text-sm text-[#4C5851] max-w-md mx-auto">
-                Para confirmar disponibilidad real y coordinar el abono o reserva, envía este
-                mensaje directo al WhatsApp oficial de Terapias La Palmilla.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            {step === 4 && (
+              <div className="py-4 text-center">
+                <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-whatsapp/15 text-whatsapp">
+                  <WhatsAppIcon className="w-8 h-8" />
+                </span>
+                <p className="mx-auto mt-5 max-w-sm text-[15px] leading-relaxed text-muted">
+                  Abrimos WhatsApp con tu solicitud. Solo tienes que <strong className="text-forest">enviar el mensaje</strong> y te
+                  responderemos con la disponibilidad y los datos para el abono.
+                </p>
                 <a
-                  href={`https://wa.me/${SITE_INFO.whatsappRaw}?text=${whatsappMessage}`}
+                  href={whatsappLink(message())}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => {
-                    trackGAEvent('contact_whatsapp', {
-                      source: 'booking_modal',
-                      item_name: selectedService.name,
-                    });
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-semibold text-white hover:brightness-95 transition"
+                  className="btn mt-6 bg-whatsapp text-white hover:brightness-95"
                 >
-                  <MessageCircle className="w-4 h-4" /> Enviar por WhatsApp
+                  <WhatsAppIcon className="w-4 h-4" /> ¿No se abrió? Toca aquí
                 </a>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-full border border-[#DED8CC] bg-white px-6 py-3 text-sm font-medium text-[#1C2822] hover:bg-[#EAE4D7] transition"
-                >
-                  Volver al sitio
-                </button>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Pie con total y acción */}
+        <div className="shrink-0 border-t border-line bg-cream px-5 sm:px-7 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {step < 4 ? (
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <span className="block text-xs text-muted truncate">{tier ? `Total · ${tier.label}` : 'Elige una experiencia'}</span>
+                <span className="font-display text-[1.9rem] font-semibold leading-none text-forest tabular-nums">
+                  {tier ? formatClp(tier.price) : '—'}
+                </span>
+              </div>
+              <button type="submit" disabled={!canNext} className={`shrink-0 !px-6 !py-3.5 ${step === 3 ? 'btn bg-whatsapp text-white hover:brightness-95' : 'btn-primary'}`}>
+                {step === 3 ? (
+                  <>
+                    <WhatsAppIcon className="w-4 h-4" /> Enviar solicitud
+                  </>
+                ) : (
+                  <>
+                    Continuar <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
             </div>
+          ) : (
+            <button type="button" onClick={onClose} className="btn-outline w-full !py-3.5">
+              Volver al sitio
+            </button>
           )}
         </div>
-      </div>
+      </form>
     </div>
   );
-};
+}
