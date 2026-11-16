@@ -71,7 +71,7 @@ export function Hero({ onBook }: { onBook: () => void }) {
             <div className="col-span-2 sm:col-span-1">
               <dt className="text-[11px] uppercase tracking-[0.2em] text-white/55">Ubicación</dt>
               <dd className="mt-1 text-sm font-medium">
-                <a href={SITE_INFO.mapsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-gold-soft transition-colors">
+                <a href={SITE_INFO.mapsUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 min-w-11 items-center gap-1.5 hover:text-gold-soft transition-colors">
                   <MapPin className="w-3.5 h-3.5" /> La Palmilla, Rauco
                 </a>
               </dd>
