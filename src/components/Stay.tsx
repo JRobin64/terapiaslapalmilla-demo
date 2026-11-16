@@ -1,3 +1,4 @@
+import { ResponsiveImage } from './ui/ResponsiveImage';
 import { ArrowRight, Check } from 'lucide-react';
 import { SERVICES, STAY_AMENITIES, type ServiceItem } from '../data/services';
 import { useReveal } from '../hooks/useReveal';
@@ -45,8 +46,9 @@ export function Stay({ onBook }: { onBook: (s: ServiceItem) => void }) {
 
         <div className="reveal space-y-5" style={{ ['--reveal-delay' as string]: '150ms' }}>
           <div className="relative overflow-hidden rounded-[1.75rem]">
-            <img
+            <ResponsiveImage
               src="./images/cabana-interior.webp"
+              sizes="(min-width: 1280px) 568px, (min-width: 1024px) calc((100vw - 144px) / 2), (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
               alt="Interior de la cabaña"
               loading="lazy"
               decoding="async"

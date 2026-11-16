@@ -1,3 +1,4 @@
+import { ResponsiveImage } from './ui/ResponsiveImage';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
 import { GALLERY_IMAGES, SITE_INFO } from '../data/services';
@@ -44,8 +45,11 @@ export function Gallery() {
               style={{ ['--reveal-delay' as string]: `${(i % 4) * 70}ms` }}
               aria-label={`Ver foto: ${img.caption}`}
             >
-              <img
+              <ResponsiveImage
                 src={img.src}
+                sizes={i === 0 || i === 5
+                  ? '(min-width: 1280px) 600px, (min-width: 768px) calc((100vw - 80px) / 2), (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)'
+                  : '(min-width: 1280px) 292px, (min-width: 768px) calc((100vw - 112px) / 4), (min-width: 640px) calc((100vw - 80px) / 2), calc((100vw - 52px) / 2)'}
                 alt={img.caption}
                 loading="lazy"
                 decoding="async"
@@ -107,9 +111,10 @@ function Lightbox({ index, setIndex }: { index: number; setIndex: (i: number | n
       </div>
 
       <div className="relative flex flex-1 items-center justify-center px-4 sm:px-20 min-h-0" onClick={close}>
-        <img
+        <ResponsiveImage
           key={img.src}
           src={img.src}
+          sizes="(min-width: 640px) calc(100vw - 160px), calc(100vw - 32px)"
           alt={img.caption}
           onClick={(e) => e.stopPropagation()}
           className="animate-fade-in max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
@@ -142,7 +147,7 @@ function Lightbox({ index, setIndex }: { index: number; setIndex: (i: number | n
               }`}
               aria-label={`Ir a la foto ${i + 1}`}
             >
-              <img src={g.src} alt="" className="h-full w-full object-cover" />
+              <ResponsiveImage src={g.src} sizes="64px" thumbnail alt="" className="h-full w-full object-cover" />
             </button>
           ))}
         </div>

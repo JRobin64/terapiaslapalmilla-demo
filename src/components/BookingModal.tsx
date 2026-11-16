@@ -1,3 +1,4 @@
+import { ResponsiveImage } from './ui/ResponsiveImage';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Info, X } from 'lucide-react';
 import { CATEGORIES, SERVICES, SITE_INFO, whatsappLink, type ServiceItem } from '../data/services';
@@ -226,7 +227,7 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                     onClick={() => setPickerOpen(true)}
                     className="flex w-full items-center gap-4 rounded-2xl bg-white p-3 pr-4 text-left ring-2 ring-forest"
                   >
-                    <img src={service.image} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                    <ResponsiveImage src={service.image} sizes="64px" thumbnail alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold text-forest">{service.name}</span>
                       <span className="block text-xs text-muted">{service.duration}</span>
@@ -255,7 +256,7 @@ export function BookingModal({ isOpen, initialService, onClose }: BookingModalPr
                                     sel ? 'ring-2 ring-forest' : 'ring-line hover:ring-forest/40'
                                   }`}
                                 >
-                                  <img src={s.image} alt="" loading="lazy" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                                  <ResponsiveImage src={s.image} sizes="48px" thumbnail alt="" loading="lazy" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
                                   <span className="min-w-0 flex-1">
                                     <span className="block text-sm font-semibold text-forest">{s.name}</span>
                                     <span className="block text-xs text-muted">{s.duration}</span>
