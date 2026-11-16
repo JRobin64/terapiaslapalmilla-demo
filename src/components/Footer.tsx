@@ -1,7 +1,13 @@
+import { useEffect, useState } from 'react';
 import { SITE_INFO } from '../data/services';
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from './ui/BrandIcons';
 
 export function Footer({ onBook }: { onBook: () => void }) {
+  const [year, setYear] = useState<number | null>(null);
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className="bg-forest-deep text-sage">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -72,7 +78,7 @@ export function Footer({ onBook }: { onBook: () => void }) {
         </div>
 
         <div className="flex flex-col gap-2 border-t border-white/10 py-6 text-xs text-sage/70 sm:flex-row sm:justify-between">
-          <span>© {new Date().getFullYear()} {SITE_INFO.tagline}</span>
+          <span>© {year} {SITE_INFO.tagline}</span>
           <span>Rauco · Región del Maule · Chile</span>
         </div>
       </div>

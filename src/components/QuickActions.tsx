@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { whatsappLink } from '../data/services';
 import { useScrolled } from '../hooks/useScrolled';
 import { trackGAEvent } from '../utils/analytics';
@@ -7,7 +8,14 @@ const WA_MSG = 'Hola Terapias La Palmilla, quisiera consultar disponibilidad par
 
 /** Barra inferior en móvil y botón flotante de WhatsApp en escritorio. */
 export function QuickActions({ onBook, hidden }: { onBook: () => void; hidden: boolean }) {
-  const pastHero = useScrolled(typeof window !== 'undefined' ? window.innerHeight * 0.7 : 500);
+  const [offset, setOffset] = useState(500);
+  useEffect(() => {
+    const onResize = () => setOffset(window.innerHeight * 0.7);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const pastHero = useScrolled(offset);
   const show = pastHero && !hidden;
 
   return (
