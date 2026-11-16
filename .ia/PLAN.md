@@ -25,8 +25,8 @@ Reparto pedido por el usuario: implementa codex, revisa agy. Fuera de alcance: c
 | T001 | Rediseño completo del sitio | — | claude | codex | integrada |
 | T002 | Portada más rápida (LCP y fuentes) | — | codex | agy | integrada |
 | T003 | Overlays: botón atrás, zoom iOS y salto a horarios | — | codex | agy | integrada |
-| T004 | Imágenes responsivas para celular | T002 | codex | agy | en-curso |
-| T005 | Botones táctiles, llamada y accesibilidad | T003, T004 | codex | agy | pendiente |
+| T004 | Imágenes responsivas para celular | T002 | codex | agy | integrada |
+| T005 | Botones táctiles, llamada y accesibilidad | T003, T004 | codex | agy | en-curso |
 | T006 | Prerenderizado del HTML en el build | T005 | codex | agy | pendiente |
 
 Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqueada)
@@ -37,3 +37,4 @@ Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqu
 - 2026-11-16 — T002 r1: codex implementó, agy APROBADO. Integrada.
 - 2026-11-16 — T003 r1: codex, agy APROBADO; el coordinador detectó crypto.randomUUID (iOS < 15.4) → r2 codex (contador) + coordinador (prefijo por carga); agy APROBADO. Integrada.
 - 2026-11-16 — Medición tras T004 (local): imágenes sobredimensionadas 760 → 184 KiB; LCP sigue en 4,2 s por render delay del JS (el HTML llega vacío). Se añade T006 (prerender).
+- 2026-11-16 — T004 r1 codex, agy CAMBIOS (w-auto en visor); r2 codex, agy APROBADO. Integrada.
