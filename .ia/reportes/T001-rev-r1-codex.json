@@ -1,0 +1,19 @@
+{
+  "veredicto": "CAMBIOS",
+  "resumen": "Diff completo revisado. TypeScript y build pasan; la instalación requirió --ignore-scripts por restricciones del entorno. Pruebas focalizadas de fechas, duración y bloqueos ejecutadas. No fue posible verificar visualmente 390 px ni contrastar el sitio original (502).",
+  "problemas": [
+    {
+      "severidad": "importante",
+      "archivo": "src/data/services.ts",
+      "linea": 235,
+      "descripcion": "Se publican y envían por WhatsApp precios faciales para tres personas ($66.000/$72.600) que, según las notas de la tarea, fueron calculados y siguen pendientes de confirmación. Incumple el criterio de no inventar datos. Retirar esas tarifas hasta confirmarlas u ofrecer consulta sin precio."
+    },
+    {
+      "severidad": "importante",
+      "archivo": "src/components/BookingModal.tsx",
+      "linea": 85,
+      "descripcion": "Las horas no se filtran según la fecha elegida y la hora actual de Chile. Reproducido un jueves a las 19:00: todavía aparece «Hoy» para el pack de 165 minutos, pero todas sus horas (15:00–18:00) ya pasaron; el formulario permite enviar esa reserva. También permite alojamiento para hoy después del check-in. Filtrar horarios pasados y excluir fechas sin horas válidas para el servicio."
+    }
+  ],
+  "commit": "6263cff33503f10071b66826a802b1a5d1e10397"
+}

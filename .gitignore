@@ -2,3 +2,14 @@ node_modules
 dist
 .env
 .DS_Store
+.ia/wt/
+.ia/rev/
+.ia/logs/
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+.pytest_cache/
+dist/
+build/
+*.tsbuildinfo
