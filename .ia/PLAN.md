@@ -5,6 +5,11 @@ Versión final del sitio de Terapias La Palmilla: moderna, limpia y fluida, con 
 original (terapiaslapalmilla.cl) y del prototipo previo, y un flujo de reserva por WhatsApp sin fricción.
 Terminado cuando: build sin errores, revisión aprobada, se ve bien en celular y escritorio, y el usuario da el OK para main.
 
+## Fase 2 — mejoras para celular (auditoría 2026-11-16)
+Lighthouse móvil: rendimiento 84 (LCP 4,3 s), resto 100. 34 elementos tocables < 44 px, inputs de 15 px (zoom iOS),
+botón atrás sale del sitio con overlays abiertos, 760 KiB de imágenes sobredimensionadas.
+Reparto pedido por el usuario: implementa codex, revisa agy. Fuera de alcance: caché de GitHub Pages (depende del hosting).
+
 ## Arquitectura / decisiones
 - Se mantiene el stack del prototipo (React 19 + Vite + Tailwind v4); una sola página con secciones ancladas.
 - Contenido centralizado en `src/data/services.ts`.
@@ -18,6 +23,10 @@ Terminado cuando: build sin errores, revisión aprobada, se ve bien en celular y
 | ID | Título | Depende de | Implementa | Revisa | Estado |
 |----|--------|------------|------------|---------|--------|
 | T001 | Rediseño completo del sitio | — | claude | codex | integrada |
+| T002 | Portada más rápida (LCP y fuentes) | — | codex | agy | pendiente |
+| T003 | Overlays: botón atrás, zoom iOS y salto a horarios | — | codex | agy | pendiente |
+| T004 | Imágenes responsivas para celular | T002 | codex | agy | pendiente |
+| T005 | Botones táctiles, llamada y accesibilidad | T003, T004 | codex | agy | pendiente |
 
 Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqueada)
 
