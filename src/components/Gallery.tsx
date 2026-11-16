@@ -117,7 +117,7 @@ function Lightbox({ index, setIndex }: { index: number; setIndex: (i: number | n
           sizes="(min-width: 640px) calc(100vw - 160px), calc(100vw - 32px)"
           alt={img.caption}
           onClick={(e) => e.stopPropagation()}
-          className="animate-fade-in max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
+          className="animate-fade-in w-auto max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
         />
         <button
           onClick={(e) => { e.stopPropagation(); go(-1); }}
