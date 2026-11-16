@@ -1,0 +1,6 @@
+{
+  "veredicto": "APROBADO",
+  "resumen": "Diff completo revisado. Ambos problemas de r1 corregidos: tarifas faciales y horarios pasados. TypeScript y build pasan; 44 escenarios temporales y bloqueos anidados con DOM simulado pasan. npm ci requirió --ignore-scripts por restricciones del entorno. No fue posible verificar visualmente 390 px ni contrastar el sitio original (502).",
+  "problemas": [],
+  "commit": "9372804bc80837fc9b376878778ca4523b70bd78"
+}

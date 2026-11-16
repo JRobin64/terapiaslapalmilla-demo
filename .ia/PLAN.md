@@ -17,9 +17,10 @@ Terminado cuando: build sin errores, revisión aprobada, se ve bien en celular y
 ## Tareas
 | ID | Título | Depende de | Implementa | Revisa | Estado |
 |----|--------|------------|------------|---------|--------|
-| T001 | Rediseño completo del sitio | — | claude | codex | revision |
+| T001 | Rediseño completo del sitio | — | claude | codex | integrada |
 
 Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqueada)
 
 ## Registro
 - 2026-11-16 — Proyecto incorporado a agentdeck. T001 implementada por Claude antes de incorporar el proyecto; pasa a revisión cruzada con codex.
+- 2026-11-16 — T001 r1 codex: CAMBIOS (precios faciales calculados; horarios pasados de hoy). Corregido por claude. r2 codex: APROBADO. Integrada en desarrollo.
