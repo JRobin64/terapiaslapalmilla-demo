@@ -24,13 +24,6 @@ export const IMAGE_METADATA: Record<string, { width: number; height: number; var
       960
     ]
   },
-  "./images/gemoterapia.webp": {
-    "width": 780,
-    "height": 520,
-    "variants": [
-      640
-    ]
-  },
   "./images/hero.webp": {
     "width": 1600,
     "height": 1068,

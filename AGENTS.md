@@ -26,6 +26,7 @@ Público: personas en celular principalmente; todo el contenido en español de C
 - Colores solo con los tokens de `@theme` (no hex sueltos en componentes). Tipografía: Cormorant Garamond (títulos, `font-display`) y Plus Jakarta Sans (texto).
 - Mobile-first: probar a 390 px de ancho; nada de scroll horizontal; respetar `prefers-reduced-motion`.
 - Nunca inventar datos del negocio (precios, reseñas, cifras): solo lo que está en `services.ts` o en el sitio original.
+- Para pausar un servicio sin borrarlo: `temporarilyUnavailable: true` y `badge` en `services.ts` (se muestra en gris, sin reserva, con consulta por WhatsApp).
 - No añadir dependencias nuevas sin que la tarea lo indique.
 - `package-lock.json` debe generarse en Linux (el deploy corre en Ubuntu).
 

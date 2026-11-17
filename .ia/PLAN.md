@@ -29,6 +29,7 @@ Reparto pedido por el usuario: implementa codex, revisa agy. Fuera de alcance: c
 | T005 | Botones táctiles, llamada y accesibilidad | T003, T004 | codex | agy | integrada |
 | T006 | Prerenderizado del HTML en el build | T005 | codex | agy | integrada |
 | T007 | Fuentes servidas desde el propio sitio | T006 | codex | — | descartada |
+| T008 | Eliminar el servicio de terapias energéticas | — | codex | agy | integrada |
 
 Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqueada)
 
@@ -44,3 +45,4 @@ Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqu
 - 2026-11-16 — T006 r1 codex, agy APROBADO. Integrada.
 - 2026-11-16 — Medición con limitación real (devtools, móvil): main publicado = rendimiento 72–83, FCP 2,4 s, LCP 4,2–5,3 s, 1.328 KiB; desarrollo (T002–T006) = 99, FCP/LCP 1,5 s. T007 (fuentes propias) = 98, LCP 1,6–1,7 s → no aporta; propuesta de descartarla.
 - 2026-11-16 — T007 descartada con OK del usuario. desarrollo pasa a main y se publica.
+- 2026-11-16 — T008 r1 codex, agy APROBADO. Servicio de terapias energéticas eliminado. Integrada en desarrollo (pendiente OK para main).

@@ -1,4 +1,4 @@
-export type ServiceCategory = 'tinajas' | 'masajes' | 'packs' | 'energeticas';
+export type ServiceCategory = 'tinajas' | 'masajes' | 'packs';
 
 export interface PriceTier {
   label: string;
@@ -59,7 +59,6 @@ export const CATEGORIES: { id: 'all' | ServiceCategory; label: string }[] = [
   { id: 'tinajas', label: 'Tinajas' },
   { id: 'packs', label: 'Packs y alojamiento' },
   { id: 'masajes', label: 'Masajes' },
-  { id: 'energeticas', label: 'Terapias energéticas' },
 ];
 
 export const SERVICES: ServiceItem[] = [
@@ -234,25 +233,6 @@ export const SERVICES: ServiceItem[] = [
       { label: '2 personas · Relajación', people: 2, price: 44000 },
       { label: '2 personas · Descontracturante', people: 2, price: 48400 },
     ],
-  },
-  {
-    id: 'terapia-gemoterapia-reiki',
-    category: 'energeticas',
-    name: 'Terapias energéticas',
-    subtitle: 'Gemoterapia, reiki y cuencos',
-    duration: '45 minutos',
-    minutes: 45,
-    temporarilyUnavailable: true,
-    badge: 'Pausado temporalmente',
-    description:
-      'Terapia de 45 minutos en la que se utilizan cuarzos o piedras energéticas, reiki (canalización de energía a través de las manos) y el sonido de los cuencos para recuperar el equilibrio físico, emocional y mental. También disponible como alineación de chakras con cuarzos.',
-    highlights: [
-      'Cuarzos, reiki y vibración de cuencos',
-      'Alineación de chakras con cuarzos',
-      'Escríbenos para saber cuándo vuelve',
-    ],
-    image: './images/gemoterapia.webp',
-    tiers: [{ label: '1 persona', people: 1, price: 19000 }],
   },
 ];
 

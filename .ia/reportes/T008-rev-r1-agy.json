@@ -1,0 +1,6 @@
+{
+  "problemas": [],
+  "resumen": "Cambios verificados frente a 86255a299ef1c0a15f0acb1feb97c71393472c67: se eliminó `terapia-gemoterapia-reiki` y la categoría `'energeticas'` de `src/data/services.ts`, se borraron `public/images/gemoterapia.webp` y `public/images/gemoterapia-640.webp`, `python3 scripts/imagenes.py` confirma que `src/components/ui/imageMetadata.ts` está actualizado sin cambios pendientes, se conservó el soporte de `temporarilyUnavailable` en `ServiceItem`, `ServiceCard`, `ServiceDrawer` y `BookingModal` junto con la convención en `AGENTS.md`. Verificaciones ejecutadas: `npx tsc -b` y `npm run build` sin errores, `grep -rniE \"energ|gemoterapia|reiki|cuenco|chakra\" src index.html public dist` sin coincidencias, y el HTML prerenderizado en `dist/index.html` muestra 8 tarjetas con contadores Todas 8, Tinajas 1, Packs y alojamiento 3 y Masajes 4.",
+  "veredicto": "APROBADO",
+  "commit": "8bd7521199eea2bdd08d029226dec5cb0fa7f4d1"
+}
