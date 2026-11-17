@@ -29,6 +29,7 @@ Reparto pedido por el usuario: implementa codex, revisa agy. Fuera de alcance: c
 | T005 | Botones táctiles, llamada y accesibilidad | T003, T004 | codex | agy | integrada |
 | T006 | Prerenderizado del HTML en el build | T005 | codex | agy | integrada |
 | T007 | Fuentes servidas desde el propio sitio | T006 | codex | — | descartada |
+| T008 | Eliminar el servicio de terapias energéticas | — | codex | agy | en-curso |
 
 Estados: pendiente → en-curso → revision → aprobada → integrada (o bloqueada)
 
