@@ -30,8 +30,11 @@ Público: personas en celular principalmente; todo el contenido en español de C
 - No añadir dependencias nuevas sin que la tarea lo indique.
 - `package-lock.json` debe generarse en Linux (el deploy corre en Ubuntu).
 
-## Equipo de IAs
-- Coordinador: Claude Code. Planifica en `.ia/PLAN.md` y reparte tareas en `.ia/tareas/`.
-- Implementan: Codex o agy, cada tarea en su rama `ia/<ID>` (copia de trabajo en `.ia/wt/<ID>`).
-- Revisa siempre una IA distinta de la que implementó.
-- Las IAs implementadoras NO hacen commit, push, ni cambian de rama, y NO tocan `.ia/`.
+## Flujo de trabajo
+- Una tarea = un issue de GitHub = una rama `issue-<N>-<slug>` = un Pull Request a `main`. El PR cierra el issue (`Cierra #N`).
+- El CI (`tsc -b` + build) debe pasar antes de integrar. Integra Claude tras el OK del usuario.
+- `main` se publica automáticamente (hoy en GitHub Pages; al lanzar, en el hosting del dominio).
+- Brief y preguntas al cliente: `docs/brief.md`. Lanzamiento: `docs/entrega.md`. Tablero: GitHub Project "Clientes".
+
+## Historial
+- `.ia/PLAN.md`, `.ia/tareas/` y `.ia/reportes/` guardan el registro de las tareas hechas antes con el equipo de IAs (agentdeck, ya retirado). Solo consulta; el desarrollo ahora lo hace Claude Code directamente.

@@ -1,0 +1,15 @@
+name: Tarea
+description: Algo que hay que construir o cambiar
+labels: [tarea]
+body:
+  - type: textarea
+    id: que
+    attributes: { label: Qué se necesita, description: 'En palabras del cliente si es posible' }
+    validations: { required: true }
+  - type: textarea
+    id: listo
+    attributes:
+      { label: Criterios de aceptación, description: 'Cómo sabremos que está terminado', value: '- [ ] ' }
+  - type: textarea
+    id: material
+    attributes: { label: Material, description: 'Textos, fotos, enlaces, referencias' }
