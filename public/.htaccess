@@ -1,0 +1,53 @@
+# Terapias La Palmilla — configuración para el hosting Apache (misitio).
+# En GitHub Pages este archivo se ignora.
+
+Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # HTTPS y dominio sin www
+  RewriteCond %{HTTPS} !=on [OR]
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteRule ^ https://terapiaslapalmilla.cl%{REQUEST_URI} [R=301,L,NE]
+
+  # --- Redirecciones 301 desde el WordPress anterior (issue #1) ---
+  # Secciones
+  RewriteRule ^(contact|reservas|eventos)/?$ /#contacto [R=301,L,NE]
+  RewriteRule ^about/?$ /#esencia [R=301,L,NE]
+  RewriteRule ^galeria/?$ /#galeria [R=301,L,NE]
+  RewriteRule ^politicas/?$ /#politicas [R=301,L,NE]
+  RewriteRule ^alojamiento/?$ /#alojamiento [R=301,L,NE]
+  RewriteRule ^(tinajacaliente|tinajasdeaguacaliente|masajes|packs|yoga|gemoterapia|tienda)/?$ /#experiencias [R=301,L,NE]
+
+  # Productos y categorías de WooCommerce
+  RewriteRule ^producto/[^/]*alojamiento[^/]*/?$ /#alojamiento [R=301,L,NE]
+  RewriteRule ^producto/ /#experiencias [R=301,L,NE]
+  RewriteRule ^categoria-producto/alojamiento/?$ /#alojamiento [R=301,L,NE]
+  RewriteRule ^categoria-producto/ /#experiencias [R=301,L,NE]
+
+  # Páginas de prueba, carrito/cuenta y rutas internas de WordPress
+  RewriteRule ^(hello-world|entrada-de-prueba|sample-page|carrito|finalizar-compra|mi-cuenta)/?$ / [R=301,L]
+  RewriteRule ^(wp-admin|wp-login\.php|wp-content|wp-includes|feed|comments|author|category|tag)(/|$) / [R=301,L]
+  RewriteRule ^(wp-sitemap.*\.xml|sitemap_index\.xml)$ /sitemap.xml [R=301,L]
+  RewriteCond %{QUERY_STRING} (^|&)(p|page_id|product)=
+  RewriteRule ^$ /? [R=301,L]
+</IfModule>
+
+# Caché: los archivos con hash de Vite (assets/) son inmutables; imágenes 30 días; HTML siempre fresco
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(webp|avif|jpg|jpeg|png|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/xml text/plain
+</IfModule>
