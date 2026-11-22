@@ -1,0 +1,11 @@
+name: Error
+description: Algo que funciona mal
+labels: [error]
+body:
+  - type: textarea
+    id: que
+    attributes: { label: Qué pasa, description: 'Qué se esperaba y qué ocurre' }
+    validations: { required: true }
+  - type: input
+    id: donde
+    attributes: { label: Dónde, description: 'URL, dispositivo, navegador' }
